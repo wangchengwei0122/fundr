@@ -1,176 +1,72 @@
-# Campaign Indexer
+# Campaign Indexer (apps/indexer)
 
-链上 Campaign 事件索引器，用于监听 `CampaignCreated` 事件并将数据同步到 PostgreSQL 数据库。
+`apps/indexer` is the only module that reads blockchain data in this workspace. It listens for `CampaignCreated` events via viem’s WebSocket transport, calls campaign contracts for summaries, and writes normalized rows to PostgreSQL through the shared Drizzle schema (`packages/db`).
 
-## 功能特性
+## Key features
 
-- ✅ 监听 `CampaignCreated` 事件
-- ✅ 从链上读取 Campaign 合约的完整数据（`getSummary()`）
-- ✅ 自动重试机制（可配置）
-- ✅ RPC 请求频率控制（避免超过免费额度）
-- ✅ 断点续跑（从上次 checkpoint 开始）
-- ✅ 定期更新已有 Campaign 的状态
-- ✅ 支持 Supabase PostgreSQL（SSL 连接）
+- WebSocket-friendly viem client with retry/backoff, batch RPC throttling, and automatic reconnection.
+- Drizzle-powered writes to `campaigns` and `checkpoints` so the API and indexer share identical schema definitions.
+- Checkpoint tracking allows restarting from the last processed block to avoid reprocessing historical data.
+- Periodic re-syncs keep existing campaigns fresh (status, pledged totals, deadlines).
+- Production readiness with structured pino logs, env guards, and optional Supabase SSL support.
 
-## 环境变量配置
+## Data pipeline
 
-在 `apps/indexer/.env` 文件中配置以下环境变量：
+1. `CampaignCreated` event is emitted on the blockchain.
+2. Indexer grabs the event, loads the campaign contract, and calls `getSummary()`.
+3. Campaign metadata is written to PostgreSQL (via `packages/db` schema).
+4. `checkpoints` table is updated so restarts resume from the last block.
+5. API (`apps/api`) reads from PostgreSQL, and Edge/Web clients consume the data.
 
-```bash
-# 必需配置
-RPC_HTTP=https://your-rpc-url.com          # RPC 节点 URL
-CHAIN_ID=11155111                          # 链 ID（Sepolia: 11155111）
-FACTORY=0x...                              # CampaignFactory 合约地址
-DEPLOY_BLOCK=0                             # Factory 部署的起始区块号
-DATABASE_URL=postgresql://...             # PostgreSQL 连接字符串
+## Environment variables
 
-# 可选配置
-BLOCK_BATCH=10                             # 每次扫描的区块批次大小（默认：10）
-RPC_DELAY_MS=100                           # RPC 请求之间的延迟（毫秒，默认：100）
-MAX_RETRIES=3                              # 最大重试次数（默认：3）
-RETRY_DELAY_MS=1000                        # 重试延迟（毫秒，默认：1000）
-UPDATE_INTERVAL_MS=60000                   # 定期更新间隔（毫秒，默认：60000，即 60 秒）
+| Variable | Description | Required |
+| --- | --- | --- |
+| `RPC_HTTP` | RPC URL for the chain | ✅ |
+| `CHAIN_ID` | Numeric Chain ID (e.g., `11155111` for Sepolia) | ✅ |
+| `FACTORY` | Campaign factory address | ✅ |
+| `DEPLOY_BLOCK` | First block to start scanning | ✅ |
+| `DATABASE_URL` | PostgreSQL connection string | ✅ |
+| `BLOCK_BATCH` | Number of blocks per batch (default `10`) | ⚪ |
+| `RPC_DELAY_MS` | Milliseconds between RPC calls (default `100`) | ⚪ |
+| `MAX_RETRIES` | RPC retry limit (default `3`) | ⚪ |
+| `RETRY_DELAY_MS` | Delay between retries (default `1000`) | ⚪ |
+| `UPDATE_INTERVAL_MS` | Interval to refresh existing campaigns (default `60000`) | ⚪ |
+| `NODE_TLS_REJECT_UNAUTHORIZED` | Set to `0` for self-signed RPC/Supabase | ⚪ |
+| `DATABASE_SSL` | Enable SSL when connecting to Supabase | ⚪ |
 
-# Supabase SSL 配置（开发环境）
-NODE_TLS_REJECT_UNAUTHORIZED=0             # 开发环境禁用 SSL 验证
-DATABASE_SSL=true                          # 启用 SSL 连接
-```
+Copy the example `.env.example` (if present) to `.env`, fill the required fields, and keep the values consistent with `apps/api`/`apps/web`.
 
-## 数据库 Schema
-
-### campaigns 表
-
-| 字段          | 类型          | 说明                                                      |
-| ------------- | ------------- | --------------------------------------------------------- |
-| id            | serial        | 主键                                                      |
-| address       | text (unique) | Campaign 合约地址                                         |
-| creator       | text          | 创建者地址                                                |
-| goal          | text          | 目标金额（wei）                                           |
-| deadline      | bigint        | 截止时间（Unix 时间戳）                                   |
-| status        | integer       | 状态（0: Active, 1: Successful, 2: Failed, 3: Cancelled） |
-| total_pledged | text          | 已筹金额（wei）                                           |
-| metadata_uri  | text          | 元数据 URI                                                |
-| created_at    | timestamp     | 创建时间                                                  |
-| created_block | bigint        | 创建区块号                                                |
-
-### checkpoints 表
-
-| 字段       | 类型               | 说明                                |
-| ---------- | ------------------ | ----------------------------------- |
-| id         | text (primary key) | Checkpoint ID（如 "factory:0x..."） |
-| block      | bigint             | 最后索引的区块号                    |
-| updated_at | timestamp          | 更新时间                            |
-
-## 使用方法
-
-### 1. 安装依赖
+## Local development
 
 ```bash
 pnpm install
+pnpm --filter @apps/indexer dev      # tsx watch with TLS flag
 ```
 
-### 2. 配置环境变量
-
-复制 `.env.example` 到 `.env` 并填写配置：
+For a production-like run:
 
 ```bash
-cp .env.example .env
-# 编辑 .env 文件
+pnpm --filter @apps/indexer build
+pnpm --filter @apps/indexer start
 ```
 
-### 3. 运行数据库迁移
+Use `pnpm --filter @apps/indexer migrate:push` after schema changes to keep your development database in sync.
 
-```bash
-pnpm migrate:push
-```
+## Operational notes
 
-### 4. 启动索引器
+- The indexer only writes to PostgreSQL—it never serves HTTP. Keep it behind a process manager when running in production (Render, Fly, Docker, etc.).
+- If RPC requests fail, the built-in retry loop will resubmit up to `MAX_RETRIES`, but stable nodes and a tuned `RPC_DELAY_MS` are recommended.
+- The `checkpoints` table prevents duplicate work; you can inspect it to understand progress and resume at will.
+- Logs are emitted via Pino and include configuration details on startup so you can audit the sync window.
 
-开发模式（自动重启）：
+## Deployment hints
 
-```bash
-pnpm dev
-```
-
-生产模式：
-
-```bash
-pnpm build
-pnpm start
-```
-
-## 工作流程
-
-1. **初始索引**：从 `DEPLOY_BLOCK` 开始扫描，或从上次 checkpoint 继续
-2. **事件监听**：监听 `CampaignCreated` 事件
-3. **数据获取**：调用 Campaign 合约的 `getSummary()` 获取完整数据
-4. **数据存储**：将数据保存到 PostgreSQL 数据库
-5. **定期更新**：每 60 秒更新一次已有 Campaign 的状态
-
-## 日志输出示例
+- The Dockerfile at `apps/indexer/Dockerfile` builds a production image. Example:
 
 ```
-🚀 Starting indexer...
-📋 Configuration:
-   Factory: 0x1234...
-   Chain ID: 11155111
-   RPC: https://...
-   Block Batch: 10
-   RPC Delay: 100ms
-   Max Retries: 3
-🔍 Scanning from block 0 to 12345 (12346 blocks)
-📦 Processing new campaign: 0xabcd... (creator: 0x5678...)
-✅ Campaign indexed: 0xabcd... | Goal: 1000000000000000000 | Status: 0 | Pledged: 0
-✅ Indexed blocks 0-9 (1 new campaigns)
-...
-✅ Indexing complete
-⏰ Scheduled updates every 60s
-🔄 Updating existing campaigns...
-📊 Found 5 active campaigns to update
-✅ Campaign update complete
+docker buildx build --platform linux/amd64,linux/arm64 -t your-user/fundr-indexer:latest --push -f apps/indexer/Dockerfile .
+fly deploy --image your-user/fundr-indexer:latest
 ```
 
-## 故障处理
-
-### RPC 请求失败
-
-索引器会自动重试，最多重试 `MAX_RETRIES` 次。如果持续失败，请检查：
-
-- RPC 节点是否可用
-- 网络连接是否正常
-- RPC 请求频率是否过高（调整 `RPC_DELAY_MS`）
-
-### 数据库连接失败
-
-确保：
-
-- `DATABASE_URL` 配置正确
-- 数据库服务正在运行
-- SSL 配置正确（Supabase 需要 SSL）
-
-### 索引器停止
-
-索引器支持断点续跑，重启后会从上次 checkpoint 继续索引，不会重复处理已索引的区块。
-
-## 性能优化建议
-
-1. **调整 `BLOCK_BATCH`**：根据 RPC 节点性能调整批次大小
-2. **调整 `RPC_DELAY_MS`**：避免超过 RPC 提供商的速率限制
-3. **调整 `UPDATE_INTERVAL_MS`**：根据需求调整更新频率
-
-## 技术栈
-
-- **TypeScript** - 类型安全
-- **viem** - 以太坊交互
-- **drizzle-orm** - ORM 数据库操作
-- **PostgreSQL** - 数据库（Supabase）
-- **dotenv** - 环境变量管理
-
-## 部署
-
-- docker buildx build \
-  --platform linux/amd64,linux/arm64 \
-  -t wangchengwei123/fundr-indexer:latest \
-  --push \
-  -f apps/indexer/Dockerfile .
-- fly deploy --image wangchengwei123/fundr-indexer:latest
+- Keep `RPC_HTTP`, `DATABASE_URL`, and `FACTORY` locked in secret management so the indexer can reconnect safely.
