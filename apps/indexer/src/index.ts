@@ -1,5 +1,14 @@
 import 'dotenv/config';
-import { createPublicClient, http, parseAbiItem, webSocket, type Address, type Log } from 'viem';
+import {
+  createPublicClient,
+  http,
+  parseAbiItem,
+  webSocket,
+  type Address,
+  type Log,
+  type AbiEvent,
+} from 'viem';
+import { sepolia } from 'viem/chains';
 import { db } from './db/client.js';
 import { campaigns, checkpoints } from '@packages/db';
 import { eq } from 'drizzle-orm';
@@ -24,9 +33,7 @@ const RECONNECT_BACKOFF = [1_000, 2_000, 5_000, 10_000] as const;
  *  CLIENTS
  * -------------------------- */
 const chain = {
-  id: CHAIN_ID,
-  name: `chain-${CHAIN_ID}`,
-  nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+  ...sepolia,
   rpcUrls: {
     default: { http: [RPC_HTTP], webSocket: [RPC_WSS] },
     public: { http: [RPC_HTTP], webSocket: [RPC_WSS] },
@@ -62,7 +69,7 @@ async function initWsClient(): Promise<void> {
 
 const campaignCreatedEvent = campaignFactoryAbi.find(
   (item) => item.type === 'event' && item.name === 'CampaignCreated'
-);
+) as AbiEvent | undefined;
 
 type CampaignCreatedLog = Log & {
   args: {
@@ -88,6 +95,7 @@ async function readCheckpoint(): Promise<bigint | null> {
 
 async function writeCheckpoint(block: bigint): Promise<void> {
   if (block <= latestCheckpoint) return;
+  console.log(`📝 Writing checkpoint ${block}`);
   await db
     .insert(checkpoints)
     .values({ id: `factory:${FACTORY}`, block: Number(block) })
@@ -323,6 +331,7 @@ async function startWatchers(): Promise<void> {
         abi: campaignFactoryAbi,
         eventName: 'CampaignCreated',
         onLogs: async (logs) => {
+          console.log('🔔 CampaignCreated event', logs);
           await handleCampaignLogs(logs as CampaignCreatedLog[]);
         },
         onError: handleWatchError,
