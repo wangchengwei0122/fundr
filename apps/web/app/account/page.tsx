@@ -56,7 +56,9 @@ function ProjectCard({ campaign }: ProjectCardProps) {
               {statusLabels[campaign.status]}
             </span>
           </div>
-          <h3 className="break-words text-base font-semibold text-slate-900 sm:text-lg">{campaign.title}</h3>
+          <h3 className="break-words text-base font-semibold text-slate-900 sm:text-lg">
+            {campaign.title}
+          </h3>
           <p className="line-clamp-2 text-xs text-slate-500 sm:text-sm">{campaign.description}</p>
           <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400 sm:gap-4">
             <span className="break-words">
@@ -67,7 +69,11 @@ function ProjectCard({ campaign }: ProjectCardProps) {
         </div>
       </div>
       <div className="w-full max-w-full">
-        <Button asChild variant="outline" className="w-full rounded-full px-4 py-2 text-sm sm:w-auto">
+        <Button
+          asChild
+          variant="outline"
+          className="w-full rounded-full px-4 py-2 text-sm sm:w-auto"
+        >
           <Link href={`/projects/${campaign.address}`}>View Project</Link>
         </Button>
       </div>
@@ -89,7 +95,10 @@ function ProjectSection({
       <div className="flex w-full max-w-full items-center justify-between">
         <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">{title}</h2>
         {campaigns.length > 0 && (
-          <Button variant="ghost" className="text-xs text-slate-500 hover:text-slate-900 sm:text-sm">
+          <Button
+            variant="ghost"
+            className="text-xs text-slate-500 hover:text-slate-900 sm:text-sm"
+          >
             View All
           </Button>
         )}
@@ -121,10 +130,12 @@ export default function AccountPage() {
 
   if (!isConnected || !address) {
     return (
-      <main className="mx-auto flex w-full max-w-full flex-col gap-8 overflow-x-hidden px-4 py-8 sm:max-w-6xl sm:gap-12 sm:px-6 sm:py-12">
+      <main className="mx-auto flex w-full max-w-full flex-col gap-8 overflow-x-hidden px-4 py-4 sm:max-w-6xl sm:gap-12 sm:px-6 sm:py-6">
         <section className="w-full max-w-full rounded-[32px] bg-white p-6 shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5 sm:p-8">
           <div className="py-8 text-center">
-            <p className="text-xs text-slate-500 sm:text-sm">Please connect your wallet to view your account information</p>
+            <p className="text-xs text-slate-500 sm:text-sm">
+              Please connect your wallet to view your account information
+            </p>
           </div>
         </section>
       </main>
@@ -132,12 +143,18 @@ export default function AccountPage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-full flex-col gap-8 overflow-x-hidden px-4 py-8 sm:max-w-6xl sm:gap-12 sm:px-6 sm:py-12">
+    <main className="mx-auto flex w-full max-w-full flex-col gap-8 overflow-x-hidden px-4 py-4 sm:max-w-6xl sm:gap-12 sm:px-6 sm:py-6">
       <section className="w-full max-w-full rounded-[32px] bg-white p-4 shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5 sm:p-8">
         <div className="flex w-full max-w-full flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex w-full max-w-full items-center gap-4 sm:gap-6">
             <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-slate-100 sm:h-20 sm:w-20">
-              <Image src={profile.avatar} alt="Profile" width={80} height={80} className="h-full w-full object-cover" />
+              <Image
+                src={profile.avatar}
+                alt="Profile"
+                width={80}
+                height={80}
+                className="h-full w-full object-cover"
+              />
             </div>
             <div className="min-w-0 flex-1 space-y-1 sm:space-y-2">
               <h1 className="break-all text-xl font-semibold text-slate-900 sm:text-2xl">
@@ -166,7 +183,11 @@ export default function AccountPage() {
         campaigns={supportedCampaigns}
         isLoading={isLoadingSupported}
       />
-      <ProjectSection title="Projects I Created" campaigns={userCampaigns} isLoading={isLoadingUser} />
+      <ProjectSection
+        title="Projects I Created"
+        campaigns={userCampaigns}
+        isLoading={isLoadingUser}
+      />
     </main>
   );
 }

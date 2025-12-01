@@ -202,23 +202,29 @@ export default function CreatePage() {
         : 'Submit Creation';
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-6 py-12">
-      <header className="space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-widest text-sky-500">Create</p>
-        <h1 className="text-3xl font-semibold text-slate-900">Create</h1>
-        <p className="text-sm text-slate-500">{formHint}</p>
+    <main className="mx-auto flex w-full max-w-full flex-col gap-6 overflow-x-hidden px-4 py-4 sm:max-w-6xl sm:gap-10 sm:px-6 sm:py-6">
+      <header className="space-y-2 sm:space-y-3">
+        <p className="text-xs font-semibold uppercase tracking-widest text-sky-500 sm:text-sm">
+          Create
+        </p>
+        <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">Create</h1>
+        <p className="text-xs text-slate-500 sm:text-sm">{formHint}</p>
       </header>
 
-      <form className="grid gap-8" aria-labelledby="create-project-form" onSubmit={handleSubmit}>
-        <Card className="rounded-[28px] border-0 bg-white shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5">
-          <CardHeader className="px-8">
-            <CardTitle className="text-xl text-slate-900">Project Overview</CardTitle>
-            <CardDescription className="text-sm text-slate-500">
+      <form
+        className="grid gap-6 overflow-x-hidden sm:gap-8"
+        aria-labelledby="create-project-form"
+        onSubmit={handleSubmit}
+      >
+        <Card className="w-full max-w-full rounded-[28px] border-0 bg-white shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5">
+          <CardHeader className="px-4 sm:px-8">
+            <CardTitle className="text-lg text-slate-900 sm:text-xl">Project Overview</CardTitle>
+            <CardDescription className="text-xs text-slate-500 sm:text-sm">
               Provide title, tagline, and detailed description to help supporters understand your
               core vision.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6 px-8 pb-8">
+          <CardContent className="space-y-4 px-4 pb-6 sm:space-y-6 sm:px-8 sm:pb-8">
             <div className="grid gap-2">
               <label className="text-sm font-medium text-slate-700" htmlFor="title">
                 Project Title
@@ -256,15 +262,15 @@ export default function CreatePage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-[28px] border-0 bg-white shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5">
-          <CardHeader className="px-8">
-            <CardTitle className="text-xl text-slate-900">Funding Goal</CardTitle>
-            <CardDescription className="text-sm text-slate-500">
+        <Card className="w-full max-w-full rounded-[28px] border-0 bg-white shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5">
+          <CardHeader className="px-4 sm:px-8">
+            <CardTitle className="text-lg text-slate-900 sm:text-xl">Funding Goal</CardTitle>
+            <CardDescription className="text-xs text-slate-500 sm:text-sm">
               Set crowdfunding goal amount and key milestones to ensure a clear and credible
               timeline.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6 px-8 pb-8">
+          <CardContent className="space-y-4 px-4 pb-6 sm:space-y-6 sm:px-8 sm:pb-8">
             <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
               <div className="grid gap-2">
                 <label className="text-sm font-medium text-slate-700" htmlFor="goal">
@@ -294,14 +300,14 @@ export default function CreatePage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-[28px] border-0 bg-white shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5">
-          <CardHeader className="px-8">
-            <CardTitle className="text-xl text-slate-900">Display & Category</CardTitle>
-            <CardDescription className="text-sm text-slate-500">
+        <Card className="w-full max-w-full rounded-[28px] border-0 bg-white shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5">
+          <CardHeader className="px-4 sm:px-8">
+            <CardTitle className="text-lg text-slate-900 sm:text-xl">Display & Category</CardTitle>
+            <CardDescription className="text-xs text-slate-500 sm:text-sm">
               Upload cover image, select category, and provide media links for public display.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6 px-8 pb-8">
+          <CardContent className="space-y-4 px-4 pb-6 sm:space-y-6 sm:px-8 sm:pb-8">
             <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
               <div className="grid gap-2">
                 <label className="text-sm font-medium text-slate-700" htmlFor="category">
@@ -338,29 +344,29 @@ export default function CreatePage() {
           </CardContent>
         </Card>
 
-        <div className="flex flex-col gap-4 rounded-[28px] border border-dashed border-slate-300 p-6 text-sm text-slate-500">
-          <span className="text-base font-medium text-slate-800">Project Launch</span>
+        <div className="flex w-full max-w-full flex-col gap-3 rounded-[28px] border border-dashed border-slate-300 p-4 text-xs text-slate-500 sm:gap-4 sm:p-6 sm:text-sm">
+          <span className="text-sm font-medium text-slate-800 sm:text-base">Project Launch</span>
           <p>
             After submission, an on-chain transaction will be initiated to create a new Campaign
             through the factory contract and include it in the index.
           </p>
-          {formError && <p className="text-sm text-rose-500">{formError}</p>}
+          {formError && <p className="text-xs text-rose-500 sm:text-sm">{formError}</p>}
           {writeError && !formError && (
-            <p className="text-sm text-rose-500">{writeError.message}</p>
+            <p className="text-xs text-rose-500 sm:text-sm">{writeError.message}</p>
           )}
           {isSuccess && createdCampaignAddress && (
-            <div className="rounded-2xl border-2 border-emerald-500 bg-emerald-50 p-6">
-              <div className="space-y-4">
+            <div className="rounded-2xl border-2 border-emerald-500 bg-emerald-50 p-4 sm:p-6">
+              <div className="space-y-3 sm:space-y-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-emerald-900">
+                  <h3 className="text-base font-semibold text-emerald-900 sm:text-lg">
                     Project Created Successfully!
                   </h3>
-                  <p className="mt-1 text-sm text-emerald-700">
+                  <p className="mt-1 text-xs text-emerald-700 sm:text-sm">
                     Your campaign has been created and is now live on-chain.
                   </p>
                 </div>
                 {txHash && (
-                  <div className="rounded-xl bg-white p-3 text-xs text-slate-600">
+                  <div className="rounded-xl bg-white p-2 text-xs text-slate-600 sm:p-3">
                     <p className="font-medium text-slate-700">Transaction Hash</p>
                     <p className="break-all">{txHash}</p>
                     {receipt && (
@@ -370,14 +376,14 @@ export default function CreatePage() {
                     )}
                   </div>
                 )}
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
                   <Button
                     asChild
-                    className="rounded-full px-6 bg-emerald-600 hover:bg-emerald-700"
+                    className="w-full rounded-full bg-emerald-600 px-6 hover:bg-emerald-700 sm:w-auto"
                   >
                     <Link href={`/projects/${createdCampaignAddress}`}>View Project</Link>
                   </Button>
-                  <Button asChild variant="outline" className="rounded-full px-6">
+                  <Button asChild variant="outline" className="w-full rounded-full px-6 sm:w-auto">
                     <Link href="/">Back to Home</Link>
                   </Button>
                 </div>
@@ -385,18 +391,18 @@ export default function CreatePage() {
             </div>
           )}
           {isSuccess && !createdCampaignAddress && (
-            <div className="rounded-2xl border-2 border-emerald-500 bg-emerald-50 p-6">
-              <div className="space-y-4">
+            <div className="rounded-2xl border-2 border-emerald-500 bg-emerald-50 p-4 sm:p-6">
+              <div className="space-y-3 sm:space-y-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-emerald-900">
+                  <h3 className="text-base font-semibold text-emerald-900 sm:text-lg">
                     Transaction Confirmed!
                   </h3>
-                  <p className="mt-1 text-sm text-emerald-700">
+                  <p className="mt-1 text-xs text-emerald-700 sm:text-sm">
                     Your transaction has been confirmed. The campaign should appear shortly.
                   </p>
                 </div>
                 {txHash && (
-                  <div className="rounded-xl bg-white p-3 text-xs text-slate-600">
+                  <div className="rounded-xl bg-white p-2 text-xs text-slate-600 sm:p-3">
                     <p className="font-medium text-slate-700">Transaction Hash</p>
                     <p className="break-all">{txHash}</p>
                     {receipt && (
@@ -406,8 +412,8 @@ export default function CreatePage() {
                     )}
                   </div>
                 )}
-                <div className="flex flex-wrap gap-3">
-                  <Button asChild variant="outline" className="rounded-full px-6">
+                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
+                  <Button asChild variant="outline" className="w-full rounded-full px-6 sm:w-auto">
                     <Link href="/">Back to Home</Link>
                   </Button>
                 </div>
@@ -415,7 +421,7 @@ export default function CreatePage() {
             </div>
           )}
           {!isSuccess && txHash && (
-            <div className="rounded-2xl bg-slate-100 p-4 text-xs text-slate-600">
+            <div className="rounded-2xl bg-slate-100 p-3 text-xs text-slate-600 sm:p-4">
               <p className="font-medium text-slate-700">Transaction Hash</p>
               <p className="break-all">{txHash}</p>
               {receipt && (
@@ -426,11 +432,15 @@ export default function CreatePage() {
             </div>
           )}
           {!isSuccess && (
-            <div className="flex flex-wrap gap-3">
-              <Button type="submit" disabled={submitDisabled} className="rounded-full px-6">
+            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
+              <Button
+                type="submit"
+                disabled={submitDisabled}
+                className="w-full rounded-full px-6 sm:w-auto"
+              >
                 {submitLabel}
               </Button>
-              <Button asChild variant="outline" className="rounded-full px-6">
+              <Button asChild variant="outline" className="w-full rounded-full px-6 sm:w-auto">
                 <Link href="/">Back to Home</Link>
               </Button>
             </div>

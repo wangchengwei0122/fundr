@@ -31,7 +31,7 @@ export default function RootLayout({
         <Web3Provider>
           <div className="min-h-screen w-full max-w-full overflow-x-hidden">
             <SiteNavbar />
-            <div className="pb-16 pt-6 w-full max-w-full">{children}</div>
+            <div className="w-full max-w-full">{children}</div>
           </div>
         </Web3Provider>
       </body>

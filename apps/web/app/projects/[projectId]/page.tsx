@@ -1,7 +1,7 @@
-import { notFound } from "next/navigation";
+import { notFound } from 'next/navigation';
 
-import { ProjectDetails } from "../../../components/projects/project-details";
-import { fetchProjectDetail } from "@/src/lib/project-detail";
+import { ProjectDetails } from '../../../components/projects/project-details';
+import { fetchProjectDetail } from '@/src/lib/project-detail';
 
 export type ProjectDetailPageProps = {
   params: {
@@ -9,9 +9,7 @@ export type ProjectDetailPageProps = {
   };
 };
 
-export default async function ProjectDetailPage({
-  params,
-}: ProjectDetailPageProps) {
+export default async function ProjectDetailPage({ params }: ProjectDetailPageProps) {
   const project = await fetchProjectDetail(params.projectId);
 
   if (!project) {
@@ -19,7 +17,7 @@ export default async function ProjectDetailPage({
   }
 
   return (
-    <main className="mx-auto w-full max-w-5xl overflow-x-hidden space-y-6 px-4 py-8 sm:space-y-10 sm:px-6 sm:py-12">
+    <main className="mx-auto w-full max-w-full space-y-6 overflow-x-hidden px-4 py-4 sm:max-w-6xl sm:space-y-10 sm:px-6 sm:py-6">
       <ProjectDetails project={project} />
     </main>
   );

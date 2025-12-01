@@ -54,7 +54,7 @@ export default function HomePage() {
   const featured = sortedProjects[0] ?? FALLBACK_FEATURED;
 
   return (
-    <main className="mx-auto flex w-full max-w-full flex-col gap-8 overflow-x-hidden px-4 py-8 sm:max-w-6xl sm:gap-12 sm:px-6 sm:py-12">
+    <main className="mx-auto flex w-full max-w-full flex-col gap-8 overflow-x-hidden px-4 py-4 sm:max-w-6xl sm:gap-12 sm:px-6 sm:py-6">
       <FeaturedProjectHero project={featured} />
 
       <section className="w-full max-w-full space-y-6">
