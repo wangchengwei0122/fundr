@@ -24,7 +24,7 @@ async function fetchBackers(
   }
 
   try {
-    // 从 ABI 中找到 Pledged 事件定义
+    // Find Pledged event definition from ABI
     const pledgedEvent = campaignAbi.find(
       // (item) => item.type === 'event' && item.name === 'Pledged'
       (item): item is Extract<(typeof campaignAbi)[number], { type: 'event'; name: 'Pledged' }> =>
@@ -33,7 +33,7 @@ async function fetchBackers(
 
     if (!pledgedEvent) return [];
 
-    // 获取当前区块号，用于确定查询范围
+    // Get current block number to determine query range
     let currentBlock: bigint;
     try {
       currentBlock = await publicClient.getBlockNumber();
@@ -42,12 +42,12 @@ async function fetchBackers(
       return [];
     }
 
-    // 使用合理的区块范围：最近50000个区块（约7天，假设12秒/区块）
-    // 这避免了某些 RPC 节点不支持 'earliest' 或大范围查询的问题
+    // Use reasonable block range: last 50000 blocks (about 7 days, assuming 12 seconds per block)
+    // This avoids issues where some RPC nodes don't support 'earliest' or large range queries
     const maxBlocksToSearch = 50000n;
     const fromBlock = currentBlock > maxBlocksToSearch ? currentBlock - maxBlocksToSearch : 0n;
 
-    // 获取 Pledged 事件日志
+    // Get Pledged event logs
     let logs;
     try {
       logs = await publicClient.getLogs({
@@ -57,7 +57,7 @@ async function fetchBackers(
         toBlock: currentBlock,
       });
     } catch (error) {
-      // 如果查询失败，尝试使用更小的范围（最近10000个区块）
+      // If query fails, try smaller range (last 10000 blocks)
       console.warn('Failed to get logs with large range, trying smaller range', error);
       try {
         const smallerRange = 10000n;
@@ -69,7 +69,7 @@ async function fetchBackers(
           toBlock: currentBlock,
         });
       } catch (error2) {
-        // 如果还是失败，只查询最近1000个区块
+        // If still fails, only query last 1000 blocks
         console.warn('Failed to get logs with medium range, trying very recent blocks', error2);
         const veryRecentRange = 1000n;
         const veryRecentFromBlock =
@@ -90,10 +90,10 @@ async function fetchBackers(
     };
     const typedLogs = logs as PledgedLog[];
 
-    // 获取对应的区块信息以获取时间戳
+    // Get corresponding block information to get timestamp
     const backersWithMaybeNull = await Promise.all(
       typedLogs.map(async (log) => {
-        // viem 的 Log 类型在 pending 情况下 blockNumber/transactionHash 可能为 null
+        // viem's Log type may have null blockNumber/transactionHash in pending cases
         if (log.blockNumber == null || log.transactionHash == null) {
           return null;
         }
@@ -120,7 +120,7 @@ async function fetchBackers(
       (item): item is BackerRecord => item !== null
     );
 
-    // 按时间倒序排列（最新的在前）
+    // Sort by time descending (newest first)
     return backersWithDetails.sort((a, b) => b.timestamp - a.timestamp);
   } catch (error) {
     console.error('Failed to fetch backers', error);
@@ -140,6 +140,6 @@ export function useBackers(campaignAddress: Address | undefined) {
       return fetchBackers(campaignAddress, publicClient);
     },
     enabled: Boolean(campaignAddress && publicClient),
-    staleTime: 30000, // 30秒内不重新获取
+    staleTime: 30000, // Don't refetch within 30 seconds
   });
 }

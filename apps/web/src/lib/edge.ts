@@ -113,7 +113,7 @@ async function fetchFromEdge(
   let response: Response;
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒超时
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
     try {
       response = await fetch(url.toString(), {
@@ -128,7 +128,7 @@ async function fetchFromEdge(
       throw fetchError;
     }
   } catch (fetchError) {
-    // 连接被拒绝或其他网络错误
+    // Connection refused or other network error
     if (fetchError instanceof TypeError) {
       throw fetchError;
     }
@@ -188,7 +188,7 @@ async function fetchDirectOnChain(limit: number, cursor: number): Promise<Campai
       });
       return { summary, metadata };
     } catch (e) {
-      // 链不支持 multicall 或其他错误时降级
+      // Fallback when chain doesn't support multicall or other errors
       const [summary, metadata] = await Promise.all([
         client.readContract({ address, abi: campaignAbi, functionName: 'getSummary' }),
         client.readContract({ address, abi: campaignAbi, functionName: 'metadataURI' }),

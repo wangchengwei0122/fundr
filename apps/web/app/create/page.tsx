@@ -1,11 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type { FormEvent } from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Address, Hash } from 'viem';
-import { parseEther } from 'viem';
-import { useAccount, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
+import { parseEther, decodeEventLog } from 'viem';
+import { useAccount, usePublicClient, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,10 +32,13 @@ function resolveFactory(): Address {
 export default function CreatePage() {
   const factoryAddress = useMemo(resolveFactory, []);
   const { isConnected } = useAccount();
+  const publicClient = usePublicClient();
+  const router = useRouter();
 
   const [txHash, setTxHash] = useState<Hash | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [isUploadingMetadata, setIsUploadingMetadata] = useState(false);
+  const [createdCampaignAddress, setCreatedCampaignAddress] = useState<Address | null>(null);
 
   const { writeContractAsync, isPending: isWriting, error: writeError } = useWriteContract();
 
@@ -43,6 +47,39 @@ export default function CreatePage() {
     isSuccess,
     data: receipt,
   } = useWaitForTransactionReceipt({ hash: txHash ?? undefined });
+
+  // Parse CampaignCreated event from receipt when transaction succeeds
+  useEffect(() => {
+    if (isSuccess && receipt && publicClient) {
+      try {
+        // Find CampaignCreated event in logs
+        const campaignCreatedEvent = campaignFactoryAbi.find(
+          (item) => item.type === 'event' && item.name === 'CampaignCreated'
+        );
+
+        if (campaignCreatedEvent && receipt.logs) {
+          for (const log of receipt.logs) {
+            try {
+              const decoded = decodeEventLog({
+                abi: campaignFactoryAbi,
+                eventName: 'CampaignCreated',
+                data: log.data,
+                topics: log.topics,
+              });
+              if (decoded && decoded.args && 'campaign' in decoded.args) {
+                setCreatedCampaignAddress(decoded.args.campaign as Address);
+                break;
+              }
+            } catch {
+              // Continue to next log if this one doesn't match
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to parse CampaignCreated event', error);
+      }
+    }
+  }, [isSuccess, receipt, publicClient]);
 
   const handleSubmit = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
@@ -313,7 +350,73 @@ export default function CreatePage() {
           {writeError && !formError && (
             <p className="text-sm text-rose-500">{writeError.message}</p>
           )}
-          {txHash && (
+          {isSuccess && createdCampaignAddress && (
+            <div className="rounded-2xl border-2 border-emerald-500 bg-emerald-50 p-6">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-emerald-900">
+                    Project Created Successfully!
+                  </h3>
+                  <p className="mt-1 text-sm text-emerald-700">
+                    Your campaign has been created and is now live on-chain.
+                  </p>
+                </div>
+                {txHash && (
+                  <div className="rounded-xl bg-white p-3 text-xs text-slate-600">
+                    <p className="font-medium text-slate-700">Transaction Hash</p>
+                    <p className="break-all">{txHash}</p>
+                    {receipt && (
+                      <p className="mt-1 text-slate-500">
+                        Block: {Number(receipt.blockNumber)} · Gas: {receipt.gasUsed?.toString()}
+                      </p>
+                    )}
+                  </div>
+                )}
+                <div className="flex flex-wrap gap-3">
+                  <Button
+                    asChild
+                    className="rounded-full px-6 bg-emerald-600 hover:bg-emerald-700"
+                  >
+                    <Link href={`/projects/${createdCampaignAddress}`}>View Project</Link>
+                  </Button>
+                  <Button asChild variant="outline" className="rounded-full px-6">
+                    <Link href="/">Back to Home</Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+          {isSuccess && !createdCampaignAddress && (
+            <div className="rounded-2xl border-2 border-emerald-500 bg-emerald-50 p-6">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-emerald-900">
+                    Transaction Confirmed!
+                  </h3>
+                  <p className="mt-1 text-sm text-emerald-700">
+                    Your transaction has been confirmed. The campaign should appear shortly.
+                  </p>
+                </div>
+                {txHash && (
+                  <div className="rounded-xl bg-white p-3 text-xs text-slate-600">
+                    <p className="font-medium text-slate-700">Transaction Hash</p>
+                    <p className="break-all">{txHash}</p>
+                    {receipt && (
+                      <p className="mt-1 text-slate-500">
+                        Block: {Number(receipt.blockNumber)} · Gas: {receipt.gasUsed?.toString()}
+                      </p>
+                    )}
+                  </div>
+                )}
+                <div className="flex flex-wrap gap-3">
+                  <Button asChild variant="outline" className="rounded-full px-6">
+                    <Link href="/">Back to Home</Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+          {!isSuccess && txHash && (
             <div className="rounded-2xl bg-slate-100 p-4 text-xs text-slate-600">
               <p className="font-medium text-slate-700">Transaction Hash</p>
               <p className="break-all">{txHash}</p>
@@ -324,14 +427,16 @@ export default function CreatePage() {
               )}
             </div>
           )}
-          <div className="flex flex-wrap gap-3">
-            <Button type="submit" disabled={submitDisabled} className="rounded-full px-6">
-              {submitLabel}
-            </Button>
-            <Button asChild variant="outline" className="rounded-full px-6">
-              <Link href="/">Back to Home</Link>
-            </Button>
-          </div>
+          {!isSuccess && (
+            <div className="flex flex-wrap gap-3">
+              <Button type="submit" disabled={submitDisabled} className="rounded-full px-6">
+                {submitLabel}
+              </Button>
+              <Button asChild variant="outline" className="rounded-full px-6">
+                <Link href="/">Back to Home</Link>
+              </Button>
+            </div>
+          )}
           {isUploadingMetadata && (
             <p className="text-xs text-slate-400">Uploading metadata to IPFS...</p>
           )}

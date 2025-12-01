@@ -27,8 +27,8 @@ const statusMap: Record<number, CampaignInfo['status']> = {
 const WEI_PER_ETH = 1_000_000_000_000_000_000n;
 
 const FALLBACK_METADATA = {
-  title: '未命名项目',
-  summary: '该项目的详细描述暂不可用，稍后再试。',
+  title: 'Untitled Project',
+  summary: 'Project description is temporarily unavailable. Please try again later.',
   description: 'No project introduction content.',
   imageUrl:
     'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80',
@@ -145,12 +145,12 @@ async function fetchCampaignInfo(
 export function useUserCampaigns(userAddress: Address | undefined) {
   const publicClient = usePublicClient();
 
-  // 首先获取 Factory 地址
+  // First get the Factory address
   const factoryAddress =
     (process.env.NEXT_PUBLIC_FACTORY as Address | undefined) ||
     ('0x0000000000000000000000000000000000000000' as Address);
 
-  // 读取用户创建的项目列表
+  // Read the list of projects created by the user
   const { data: userCampaigns = [] } = useReadContract({
     address: factoryAddress,
     abi: campaignFactoryAbi,
@@ -161,7 +161,7 @@ export function useUserCampaigns(userAddress: Address | undefined) {
     },
   });
 
-  // 获取所有项目的详细信息
+  // Get detailed information for all projects
   return useQuery({
     queryKey: ['userCampaigns', userAddress, userCampaigns],
     queryFn: async () => {

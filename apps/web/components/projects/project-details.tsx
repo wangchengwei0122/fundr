@@ -16,7 +16,7 @@ import { useBackers } from '@/src/hooks/useBackers';
 import type { ProjectDetail } from './types';
 
 function formatEth(value: number) {
-  const formatted = value.toLocaleString('zh-CN', {
+  const formatted = value.toLocaleString('en-US', {
     minimumFractionDigits: value >= 1 ? 0 : 2,
     maximumFractionDigits: 4,
   });
@@ -93,12 +93,12 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
     }
   }, [address, project.owner, project.creator]);
 
-  // 可领取条件：到期且达到目标且尚未finalize（合约状态仍为 Active）
+  // Claimable condition: deadline reached, goal achieved, and not yet finalized (contract status still Active)
   const isFinalizable = project.status === 'active' && daysLeft === 0 && hasReachedGoal;
 
   const campaignAddress = useMemo(() => project.id as Address, [project.id]);
 
-  // 读取当前用户的出资额
+  // Read current user's pledge amount
   const {
     data: userPledgeData,
     refetch: refetchUserPledge,
@@ -120,7 +120,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
   const canRefund =
     userPledgeWei > 0n && (derivedStatus === 'failed' || (daysLeft === 0 && !hasReachedGoal));
 
-  // 获取 backers 列表
+  // Get backers list
   const {
     data: backers = [],
     isLoading: isLoadingBackers,
@@ -182,7 +182,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
           args: [], //
         });
         setTxHash(hash);
-        // 出资成功后刷新个人出资
+        // Refresh user pledge after successful pledge
         void refetchUserPledge();
       } catch (error) {
         if (error instanceof Error) {
@@ -298,7 +298,11 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
   return (
     <article className="space-y-10">
       <div className="overflow-hidden rounded-[32px] bg-white shadow-xl shadow-blue-950/5 ring-1 ring-slate-900/5">
-        <img src={project.imageUrl} alt={project.title} className="h-full w-full object-cover" />
+        <img
+          src={project.imageUrl}
+          alt={project.title}
+          className="h-auto w-full max-h-[500px] object-cover"
+        />
       </div>
 
       <section className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
@@ -488,7 +492,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
                                   {backer.address.slice(0, 6)}...{backer.address.slice(-4)}
                                 </p>
                                 <p className="mt-1 text-xs text-slate-500">
-                                  {new Date(backer.timestamp * 1000).toLocaleString('zh-CN', {
+                                  {new Date(backer.timestamp * 1000).toLocaleString('en-US', {
                                     year: 'numeric',
                                     month: 'short',
                                     day: 'numeric',
@@ -617,7 +621,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
             </form>
           )}
 
-          {/* 当前账户出资与操作 */}
+          {/* Current account pledge and actions */}
           {isConnected && userPledgeWei > 0n && (
             <Card className="rounded-[28px] border-0 bg-white p-6 shadow-lg shadow-blue-950/5 ring-1 ring-slate-900/5">
               <CardHeader className="px-0">
@@ -662,13 +666,13 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
               <dl className="space-y-4">
                 <div className="space-y-1">
                   <dt className="text-xs uppercase tracking-wide text-slate-400">Project Owner</dt>
-                  <dd className="font-medium text-slate-900">{project.creator}</dd>
+                  <dd className="break-words font-medium text-slate-900">{project.creator}</dd>
                 </div>
                 <div className="space-y-1">
                   <dt className="text-xs uppercase tracking-wide text-slate-400">
                     Project Creator Address
                   </dt>
-                  <dd className="whitespace-pre break-all font-medium text-slate-900">
+                  <dd className="break-words font-medium text-slate-900" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                     {project.owner}
                   </dd>
                 </div>
@@ -676,9 +680,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
                   <dt className="text-xs uppercase tracking-wide text-slate-400">
                     Project Category
                   </dt>
-                  <dd className="whitespace-pre break-all font-medium text-slate-900">
-                    {project.category}
-                  </dd>
+                  <dd className="break-words font-medium text-slate-900">{project.category}</dd>
                 </div>
               </dl>
             </CardContent>

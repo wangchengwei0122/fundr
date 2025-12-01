@@ -46,21 +46,21 @@ export function FeaturedProjectHero({ project }: FeaturedProjectHeroProps) {
       <div className="flex flex-col gap-8 self-center">
         <div className="space-y-4">
           <Badge variant="secondary" className="rounded-full bg-blue-100 px-3 py-1 text-blue-700">
-            精选项目
+            Featured Project
           </Badge>
           <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
             {project.title}
           </h1>
           <p className="text-base leading-relaxed text-slate-600">{project.summary}</p>
           <p className="text-sm text-slate-500">
-            由 <span className="font-medium text-slate-900">{project.creator}</span> 发起
+            Created by <span className="font-medium text-slate-900">{project.creator}</span>
           </p>
         </div>
 
         <div className="space-y-4">
           <div className="flex items-center justify-between text-sm font-medium text-slate-600">
-            <span>{Math.round(progress * 100)}% 已筹集</span>
-            <span className="text-slate-500">剩余 {daysLeft ?? "--"} 天</span>
+            <span>{Math.round(progress * 100)}% Raised</span>
+            <span className="text-slate-500">{daysLeft ?? "--"} days left</span>
           </div>
           <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
             <div
@@ -72,14 +72,14 @@ export function FeaturedProjectHero({ project }: FeaturedProjectHeroProps) {
 
         <div className="flex flex-wrap gap-3">
           <Button asChild className="rounded-full px-6 text-sm">
-            <Link href={`/projects/${project.id}`}>支持项目</Link>
+            <Link href={`/projects/${project.id}`}>Support Project</Link>
           </Button>
           <Button
             asChild
             variant="outline"
             className="rounded-full border-slate-200 bg-white px-6 text-sm text-slate-700 hover:bg-slate-100"
           >
-            <Link href={`/projects/${project.id}`}>了解更多</Link>
+            <Link href={`/projects/${project.id}`}>Learn More</Link>
           </Button>
         </div>
       </div>

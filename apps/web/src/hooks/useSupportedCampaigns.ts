@@ -9,8 +9,8 @@ import type { CampaignInfo } from './useUserCampaigns';
 const WEI_PER_ETH = 1_000_000_000_000_000_000n;
 
 const FALLBACK_METADATA = {
-  title: '未命名项目',
-  summary: '该项目的详细描述暂不可用，稍后再试。',
+  title: 'Untitled Project',
+  summary: 'Project description is temporarily unavailable. Please try again later.',
   description: 'No project introduction content.',
   imageUrl:
     'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80',
@@ -84,7 +84,7 @@ async function fetchSupportedCampaigns(
   publicClient: PublicClient
 ): Promise<CampaignInfo[]> {
   try {
-    // 从 ABI 中找到 Pledged 事件定义
+    // Find Pledged event definition from ABI
     const pledgedEvent = campaignAbi.find(
       (item) => item.type === 'event' && item.name === 'Pledged'
     );
@@ -93,7 +93,7 @@ async function fetchSupportedCampaigns(
       return [];
     }
 
-    // 获取当前区块号
+    // Get current block number
     let currentBlock: bigint;
     try {
       currentBlock = await publicClient.getBlockNumber();
@@ -101,7 +101,7 @@ async function fetchSupportedCampaigns(
       return [];
     }
 
-    // 查询最近50000个区块内的 Pledged 事件，其中 backer 是用户地址
+    // Query Pledged events within the last 50000 blocks where backer is the user address
     const maxBlocksToSearch = 50000n;
     const fromBlock = currentBlock > maxBlocksToSearch ? currentBlock - maxBlocksToSearch : 0n;
 
@@ -134,10 +134,10 @@ async function fetchSupportedCampaigns(
       }
     }
 
-    // 提取唯一的 campaign 地址（通过解析 log 的 address）
+    // Extract unique campaign addresses (by parsing log.address)
     const campaignAddresses = new Set<Address>();
     for (const log of logs) {
-      // log.address 就是 campaign 合约地址
+      // log.address is the campaign contract address
       if (log.address) {
         campaignAddresses.add(log.address);
       }
@@ -147,7 +147,7 @@ async function fetchSupportedCampaigns(
       return [];
     }
 
-    // 获取每个 campaign 的详细信息
+    // Get detailed information for each campaign
     const campaigns = await Promise.all(
       Array.from(campaignAddresses).map(async (address) => {
         try {

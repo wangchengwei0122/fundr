@@ -10,7 +10,7 @@ import { useSupportedCampaigns } from '@/src/hooks/useSupportedCampaigns';
 const profile = {
   avatar:
     'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=240&q=80',
-  bio: '探索 Web3 众筹新可能，关注可持续与创意科技。',
+  bio: 'Exploring new possibilities in Web3 crowdfunding, focusing on sustainability and creative technology.',
 };
 
 type ProjectCardProps = {
@@ -26,10 +26,10 @@ function ProjectCard({ campaign }: ProjectCardProps) {
   };
 
   const statusLabels: Record<CampaignInfo['status'], string> = {
-    active: '进行中',
-    successful: '成功',
-    failed: '失败',
-    cancelled: '已取消',
+    active: 'In Progress',
+    successful: 'Successful',
+    failed: 'Failed',
+    cancelled: 'Cancelled',
   };
 
   return (
@@ -57,7 +57,7 @@ function ProjectCard({ campaign }: ProjectCardProps) {
           <p className="line-clamp-2 text-sm text-slate-500">{campaign.description}</p>
           <div className="flex items-center gap-4 text-xs text-slate-400">
             <span>
-              进度: {Math.round(campaign.progress * 100)}% · 已筹{' '}
+              Progress: {Math.round(campaign.progress * 100)}% · Pledged{' '}
               {campaign.pledgedAmount.toFixed(4)} ETH
             </span>
           </div>
@@ -65,7 +65,7 @@ function ProjectCard({ campaign }: ProjectCardProps) {
       </div>
       <div>
         <Button asChild variant="outline" className="rounded-full px-4 py-2 text-sm">
-          <Link href={`/projects/${campaign.address}`}>查看项目</Link>
+          <Link href={`/projects/${campaign.address}`}>View Project</Link>
         </Button>
       </div>
     </article>
@@ -87,15 +87,15 @@ function ProjectSection({
         <h2 className="text-xl font-semibold text-slate-900">{title}</h2>
         {campaigns.length > 0 && (
           <Button variant="ghost" className="text-sm text-slate-500 hover:text-slate-900">
-            查看全部
+            View All
           </Button>
         )}
       </div>
       {isLoading ? (
-        <div className="py-8 text-center text-sm text-slate-500">加载中...</div>
+        <div className="py-8 text-center text-sm text-slate-500">Loading...</div>
       ) : campaigns.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
-          <p className="text-sm text-slate-500">暂无项目</p>
+          <p className="text-sm text-slate-500">No projects</p>
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2">
@@ -121,7 +121,7 @@ export default function AccountPage() {
       <main className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 py-12">
         <section className="rounded-[32px] bg-white p-8 shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5">
           <div className="py-8 text-center">
-            <p className="text-sm text-slate-500">请连接钱包以查看您的账户信息</p>
+            <p className="text-sm text-slate-500">Please connect your wallet to view your account information</p>
           </div>
         </section>
       </main>
@@ -141,7 +141,7 @@ export default function AccountPage() {
                 {address.slice(0, 6)}...{address.slice(-4)}
               </h1>
               <p className="text-sm text-slate-500">
-                余额: {balance ? formatUnits(balance.value, balance.decimals) : '—'}{' '}
+                Balance: {balance ? formatUnits(balance.value, balance.decimals) : '—'}{' '}
                 {balance?.symbol}
               </p>
               <p className="text-xs text-slate-400">{address}</p>
@@ -149,21 +149,21 @@ export default function AccountPage() {
           </div>
           <div className="flex items-center gap-3">
             <Button variant="outline" className="rounded-full px-5" disabled>
-              编辑资料
+              Edit Profile
             </Button>
             <Button asChild className="rounded-full px-5">
-              <Link href="/create">创建项目</Link>
+              <Link href="/create">Create Project</Link>
             </Button>
           </div>
         </div>
       </section>
 
       <ProjectSection
-        title="我支持的项目"
+        title="Projects I Supported"
         campaigns={supportedCampaigns}
         isLoading={isLoadingSupported}
       />
-      <ProjectSection title="我发起的项目" campaigns={userCampaigns} isLoading={isLoadingUser} />
+      <ProjectSection title="Projects I Created" campaigns={userCampaigns} isLoading={isLoadingUser} />
     </main>
   );
 }

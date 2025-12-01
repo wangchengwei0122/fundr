@@ -11,11 +11,11 @@ const DEFAULT_LIMIT = 12;
 const WEI_PER_ETH = 1_000_000_000_000_000_000n;
 
 const FALLBACK_METADATA = {
-  title: '未命名项目',
-  summary: '该项目的详细描述暂不可用，稍后再试。',
+  title: 'Untitled Project',
+  summary: 'Project description is temporarily unavailable. Please try again later.',
   imageUrl:
     'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80',
-  category: '未分类',
+  category: 'Unclassified',
 };
 
 type NormalisedMetadata = {
@@ -70,7 +70,7 @@ async function fetchMetadata(uri: string): Promise<NormalisedMetadata> {
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8秒超时
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
 
     const response = await fetch(url, {
       cache: 'no-store',
@@ -80,7 +80,7 @@ async function fetchMetadata(uri: string): Promise<NormalisedMetadata> {
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      // 对于 500 错误或其他错误，直接使用 fallback，不抛出异常
+      // For 500 errors or other errors, use fallback directly without throwing exception
       if (response.status >= 500) {
         metadataCache.set(uri, FALLBACK_METADATA);
         return FALLBACK_METADATA;
@@ -114,10 +114,10 @@ async function fetchMetadata(uri: string): Promise<NormalisedMetadata> {
     metadataCache.set(uri, normalised);
     return normalised;
   } catch (error) {
-    // 对于网络错误、超时或解析错误，静默使用 fallback
-    // 只在开发环境或非预期错误时记录
+    // For network errors, timeouts, or parsing errors, silently use fallback
+    // Only log in development environment or for unexpected errors
     if (error instanceof Error && !error.name.includes('Abort')) {
-      // 忽略超时错误，其他错误在开发环境记录
+      // Ignore timeout errors, log other errors in development environment
       if (process.env.NODE_ENV === 'development') {
         console.debug('Metadata fetch fallback', uri, error.message);
       }
