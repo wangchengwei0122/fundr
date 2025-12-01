@@ -67,30 +67,39 @@ export function SiteNavbar() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden">
-          <div className="border-t border-slate-200/80 bg-white px-4 py-4">
-            <nav className="flex flex-col gap-4">
-              {navItems.map((item) => {
-                const isActive =
-                  pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href));
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`rounded-lg px-4 py-2 text-base font-medium transition ${
-                      isActive
-                        ? 'bg-slate-100 text-slate-900'
-                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                    }`}
-                  >
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </nav>
+        <>
+          {/* Backdrop overlay */}
+          <div
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+          {/* Mobile menu */}
+          <div className="fixed inset-x-0 top-[73px] z-50 md:hidden">
+            <div className="mx-4 mt-2 rounded-2xl border border-slate-200/80 bg-white shadow-xl">
+              <nav className="flex flex-col gap-1 p-2">
+                {navItems.map((item) => {
+                  const isActive =
+                    pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href));
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`rounded-lg px-4 py-3 text-base font-medium transition ${
+                        isActive
+                          ? 'bg-slate-100 text-slate-900'
+                          : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </header>
   );

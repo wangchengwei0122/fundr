@@ -297,8 +297,8 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
   }, [isSuccess, txHash, refetchUserPledge, refetchBackers]);
 
   return (
-    <article className="space-y-10">
-      <div className="overflow-hidden rounded-[32px] bg-white shadow-xl shadow-blue-950/5 ring-1 ring-slate-900/5">
+    <article className="w-full max-w-full space-y-6 overflow-x-hidden sm:space-y-10">
+      <div className="w-full max-w-full overflow-hidden rounded-[32px] bg-white shadow-xl shadow-blue-950/5 ring-1 ring-slate-900/5">
         <Image
           src={project.imageUrl}
           alt={project.title}
@@ -308,41 +308,41 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
         />
       </div>
 
-      <section className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-        <div className="space-y-6">
-          <div className="rounded-[28px] bg-white p-8 shadow-lg shadow-blue-950/5 ring-1 ring-slate-900/5">
-            <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500">
-              <span>Campaign ID：{project.id}</span>
-              <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+      <section className="grid w-full max-w-full gap-4 overflow-x-hidden sm:gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-8">
+        <div className="w-full max-w-full space-y-4 sm:space-y-6">
+          <div className="w-full max-w-full rounded-[28px] bg-white p-4 shadow-lg shadow-blue-950/5 ring-1 ring-slate-900/5 sm:p-6 lg:p-8">
+            <div className="flex w-full max-w-full flex-wrap items-center gap-2 text-xs text-slate-500 sm:gap-3 sm:text-sm">
+              <span className="break-all">Campaign ID：{project.id}</span>
+              <span className="inline-flex shrink-0 items-center rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600 sm:px-3">
                 {project.category}
               </span>
             </div>
 
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
+            <div className="mt-3 flex w-full max-w-full flex-wrap items-center gap-2 sm:mt-4 sm:gap-3">
+              <h1 className="break-words text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl lg:text-3xl">
                 {project.title}
               </h1>
               <Badge
-                className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClassName[derivedStatus]}`}
+                className={`shrink-0 rounded-full px-2 py-1 text-xs font-semibold sm:px-3 ${statusClassName[derivedStatus]}`}
               >
                 {statusLabel[derivedStatus]}
               </Badge>
             </div>
 
-            <p className="mt-4 text-base leading-relaxed text-slate-600">{project.summary}</p>
+            <p className="mt-3 break-words text-sm leading-relaxed text-slate-600 sm:mt-4 sm:text-base">{project.summary}</p>
 
-            <div className="mt-8 grid gap-6 rounded-[24px] bg-slate-50 p-6">
-              <div className="grid gap-6 text-sm text-slate-500 md:grid-cols-2">
-                <div>
+            <div className="mt-6 grid w-full max-w-full gap-4 rounded-[24px] bg-slate-50 p-4 sm:mt-8 sm:gap-6 sm:p-6">
+              <div className="grid w-full max-w-full gap-4 text-xs text-slate-500 sm:gap-6 sm:text-sm md:grid-cols-2">
+                <div className="w-full max-w-full">
                   <p className="text-slate-400">Pledged Amount</p>
-                  <p className="mt-1 text-2xl font-semibold text-slate-900">
+                  <p className="mt-1 break-words text-xl font-semibold text-slate-900 sm:text-2xl">
                     {formatEth(project.pledgedAmount)}
                   </p>
                   <p className="text-xs">Completed {Math.round(progress * 100)}%</p>
                 </div>
-                <div>
+                <div className="w-full max-w-full">
                   <p className="text-slate-400">Goal Amount</p>
-                  <p className="mt-1 text-2xl font-semibold text-slate-900">
+                  <p className="mt-1 break-words text-xl font-semibold text-slate-900 sm:text-2xl">
                     {formatEth(project.goalAmount)}
                   </p>
                   <p className="text-xs">
@@ -351,7 +351,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
                 </div>
               </div>
 
-              <div className="h-3 w-full overflow-hidden rounded-full bg-white/80">
+              <div className="h-3 w-full max-w-full overflow-hidden rounded-full bg-white/80">
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-sky-500 to-blue-500"
                   style={{ width: `${Math.round(progress * 100)}%` }}
@@ -360,8 +360,8 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
             </div>
           </div>
 
-          <div className="rounded-[28px] bg-white p-8 shadow-lg shadow-blue-950/5 ring-1 ring-slate-900/5">
-            <nav className="flex flex-wrap gap-6 text-sm font-medium">
+          <div className="w-full max-w-full rounded-[28px] bg-white p-4 shadow-lg shadow-blue-950/5 ring-1 ring-slate-900/5 sm:p-6 lg:p-8">
+            <nav className="flex w-full max-w-full flex-wrap gap-3 text-xs font-medium sm:gap-6 sm:text-sm">
               <button
                 type="button"
                 onClick={() => setActiveTab('intro')}
@@ -394,18 +394,18 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
               </button>
             </nav>
 
-            <div className="mt-6">
+            <div className="mt-4 sm:mt-6">
               {activeTab === 'intro' && (
-                <div className="whitespace-pre-line text-base leading-relaxed text-slate-600">
+                <div className="whitespace-pre-line break-words text-sm leading-relaxed text-slate-600 sm:text-base">
                   {project.description}
                 </div>
               )}
 
               {activeTab === 'updates' && (
-                <div className="space-y-4">
-                  <div className="rounded-2xl bg-slate-50 p-6">
-                    <h3 className="text-lg font-semibold text-slate-900">Funding Progress</h3>
-                    <div className="mt-4 space-y-3 text-sm">
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="rounded-2xl bg-slate-50 p-4 sm:p-6">
+                    <h3 className="text-base font-semibold text-slate-900 sm:text-lg">Funding Progress</h3>
+                    <div className="mt-3 space-y-2 text-xs sm:mt-4 sm:space-y-3 sm:text-sm">
                       <div className="flex items-center justify-between">
                         <span className="text-slate-600">Current Progress</span>
                         <span className="font-semibold text-slate-900">
@@ -433,10 +433,10 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
                     </div>
                   </div>
 
-                  <div className="rounded-2xl bg-slate-50 p-6">
-                    <h3 className="text-lg font-semibold text-slate-900">Timeline</h3>
-                    <div className="mt-4 space-y-3">
-                      <div className="text-sm text-slate-600">
+                  <div className="rounded-2xl bg-slate-50 p-4 sm:p-6">
+                    <h3 className="text-base font-semibold text-slate-900 sm:text-lg">Timeline</h3>
+                    <div className="mt-3 space-y-2 sm:mt-4 sm:space-y-3">
+                      <div className="text-xs text-slate-600 sm:text-sm">
                         <p className="font-medium text-slate-900">Campaign Status</p>
                         <p className="mt-1">
                           {derivedStatus === 'active' && daysLeft > 0
@@ -451,7 +451,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
                         </p>
                       </div>
                       {backers.length > 0 && (
-                        <div className="text-sm text-slate-600">
+                        <div className="text-xs text-slate-600 sm:text-sm">
                           <p className="font-medium text-slate-900">Latest Activity</p>
                           <p className="mt-1">
                             {backers.length} backer{backers.length !== 1 ? 's' : ''} have supported
@@ -463,7 +463,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
                   </div>
 
                   {backers.length === 0 && !isLoadingBackers && (
-                    <p className="text-center text-sm text-slate-400">
+                    <p className="text-center text-xs text-slate-400 sm:text-sm">
                       No activity yet. Be the first to support this project!
                     </p>
                   )}
@@ -471,27 +471,27 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
               )}
 
               {activeTab === 'backers' && (
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {isLoadingBackers ? (
-                    <div className="py-8 text-center text-sm text-slate-500">
+                    <div className="py-6 text-center text-xs text-slate-500 sm:py-8 sm:text-sm">
                       Loading backers...
                     </div>
                   ) : backers.length === 0 ? (
-                    <div className="py-8 text-center text-sm text-slate-400">
+                    <div className="py-6 text-center text-xs text-slate-400 sm:py-8 sm:text-sm">
                       No backers yet. Be the first to support this project!
                     </div>
                   ) : (
-                    <div className="space-y-3">
-                      <p className="text-sm text-slate-600">
+                    <div className="space-y-2 sm:space-y-3">
+                      <p className="text-xs text-slate-600 sm:text-sm">
                         Total Backers:{' '}
                         <span className="font-semibold text-slate-900">{backers.length}</span>
                       </p>
                       <div className="space-y-2 divide-y divide-slate-200">
                         {backers.map((backer, index) => (
-                          <div key={`${backer.txHash}-${index}`} className="py-3 first:pt-0">
-                            <div className="flex items-start justify-between gap-4">
+                          <div key={`${backer.txHash}-${index}`} className="py-2 first:pt-0 sm:py-3">
+                            <div className="flex items-start justify-between gap-2 sm:gap-4">
                               <div className="min-w-0 flex-1">
-                                <p className="truncate font-medium text-slate-900">
+                                <p className="truncate text-sm font-medium text-slate-900 sm:text-base">
                                   {backer.address.slice(0, 6)}...{backer.address.slice(-4)}
                                 </p>
                                 <p className="mt-1 text-xs text-slate-500">
@@ -521,18 +521,18 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
           </div>
         </div>
 
-        <aside className="space-y-6">
+        <aside className="w-full max-w-full space-y-4 sm:space-y-6">
           {isCreator && isFinalizable && (
-            <Card className="rounded-[28px] border-0 bg-white p-6 shadow-lg shadow-blue-950/5 ring-1 ring-slate-900/5">
+            <Card className="w-full max-w-full rounded-[28px] border-0 bg-white p-4 shadow-lg shadow-blue-950/5 ring-1 ring-slate-900/5 sm:p-6">
               <CardHeader className="px-0">
-                <CardTitle className="text-lg font-semibold text-slate-900">Claim Funds</CardTitle>
+                <CardTitle className="text-base font-semibold text-slate-900 sm:text-lg">Claim Funds</CardTitle>
               </CardHeader>
-              <CardContent className="px-0 text-sm text-slate-500">
-                <p className="mb-4 text-slate-600">
+              <CardContent className="px-0 text-xs text-slate-500 sm:text-sm">
+                <p className="mb-3 break-words text-slate-600 sm:mb-4">
                   The campaign reached its goal. You can finalize to claim funds.
                 </p>
                 <Button
-                  className="rounded-full text-sm"
+                  className="w-full rounded-full text-xs sm:w-auto sm:text-sm"
                   onClick={handleFinalize}
                   disabled={isProcessing}
                 >
@@ -544,15 +544,15 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
 
           {project.status === 'active' && (
             <form
-              className="rounded-[28px] bg-white p-6 shadow-lg shadow-blue-950/5 ring-1 ring-slate-900/5"
+              className="w-full max-w-full rounded-[28px] bg-white p-4 shadow-lg shadow-blue-950/5 ring-1 ring-slate-900/5 sm:p-6"
               onSubmit={handleSupport}
             >
-              <h2 className="text-lg font-semibold text-slate-900">Support the Project</h2>
-              <p className="mt-2 text-sm text-slate-500">
+              <h2 className="text-base font-semibold text-slate-900 sm:text-lg">Support the Project</h2>
+              <p className="mt-2 break-words text-xs text-slate-500 sm:text-sm">
                 Your every support will be directly used for the project.
               </p>
 
-              <div className="mt-5 grid grid-cols-2 gap-3">
+              <div className="mt-4 grid w-full max-w-full grid-cols-2 gap-2 sm:mt-5 sm:gap-3">
                 {presetSupportAmounts.map((amount) => {
                   const isActive = activePreset === amount;
                   return (
@@ -561,7 +561,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
                       type="button"
                       onClick={() => handlePresetSelect(amount)}
                       className={cn(
-                        'rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition',
+                        'w-full rounded-full border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition sm:px-4 sm:text-sm',
                         'hover:border-sky-400 hover:text-sky-500',
                         isActive && 'border-sky-500 bg-sky-50 text-sky-600'
                       )}
@@ -573,7 +573,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
                 })}
               </div>
 
-              <div className="mt-6 space-y-3">
+              <div className="mt-4 w-full max-w-full space-y-2 sm:mt-6 sm:space-y-3">
                 <label className="text-xs font-medium text-slate-500" htmlFor="support-amount">
                   Custom Support Amount (ETH)
                 </label>
@@ -583,7 +583,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
                   min="0"
                   step="any"
                   placeholder="0.1"
-                  className="h-11 rounded-full border-slate-200"
+                  className="h-10 w-full max-w-full rounded-full border-slate-200 text-sm sm:h-11"
                   value={amountInput}
                   onChange={handleAmountChange}
                   disabled={!isProjectOpen || isProcessing}
@@ -591,34 +591,34 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
               </div>
 
               {formError ? (
-                <p className="mt-3 text-xs text-rose-500">{formError}</p>
+                <p className="mt-2 break-words text-xs text-rose-500 sm:mt-3">{formError}</p>
               ) : feedback ? (
-                <p className="mt-3 text-xs text-emerald-600">
+                <p className="mt-2 break-words text-xs text-emerald-600 sm:mt-3">
                   {feedback}
                   {lastTxHash ? (
                     <>
                       {' '}
-                      <span className="break-all text-[11px] text-emerald-500">{lastTxHash}</span>
+                      <span className="break-all text-[10px] text-emerald-500 sm:text-[11px]">{lastTxHash}</span>
                     </>
                   ) : null}
                 </p>
               ) : null}
 
               {!isProjectOpen ? (
-                <p className="mt-3 text-xs text-slate-400">
+                <p className="mt-2 break-words text-xs text-slate-400 sm:mt-3">
                   This project has ended or is not supported.
                 </p>
               ) : null}
 
               <Button
-                className="mt-6 w-full rounded-full text-sm"
+                className="mt-4 w-full max-w-full rounded-full text-xs sm:mt-6 sm:text-sm"
                 type="submit"
                 disabled={!isProjectOpen || isProcessing}
               >
                 {isProcessing ? 'Transaction Confirming...' : 'Support Now'}
               </Button>
 
-              <p className="mt-3 text-center text-xs text-slate-400">
+              <p className="mt-2 break-words text-center text-xs text-slate-400 sm:mt-3">
                 Your support will be used for project execution, and cannot be refunded.
               </p>
             </form>
@@ -626,20 +626,20 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
 
           {/* Current account pledge and actions */}
           {isConnected && userPledgeWei > 0n && (
-            <Card className="rounded-[28px] border-0 bg-white p-6 shadow-lg shadow-blue-950/5 ring-1 ring-slate-900/5">
+            <Card className="w-full max-w-full rounded-[28px] border-0 bg-white p-4 shadow-lg shadow-blue-950/5 ring-1 ring-slate-900/5 sm:p-6">
               <CardHeader className="px-0">
-                <CardTitle className="text-lg font-semibold text-slate-900">My Pledge</CardTitle>
+                <CardTitle className="text-base font-semibold text-slate-900 sm:text-lg">My Pledge</CardTitle>
               </CardHeader>
-              <CardContent className="px-0 text-sm text-slate-500">
-                <div className="space-y-3">
-                  <p className="text-slate-600">
+              <CardContent className="px-0 text-xs text-slate-500 sm:text-sm">
+                <div className="space-y-2 sm:space-y-3">
+                  <p className="break-words text-slate-600">
                     {isReadingPledge
                       ? 'Loading...'
                       : `You have pledged: ${formatEth(userPledgeEthNum)}`}
                   </p>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid w-full max-w-full grid-cols-2 gap-2 sm:gap-3">
                     <Button
-                      className="rounded-full text-sm"
+                      className="w-full rounded-full text-xs sm:text-sm"
                       variant="secondary"
                       onClick={handleUnpledgeAll}
                       disabled={!canUnpledge || isProcessing}
@@ -647,7 +647,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
                       {isProcessing ? 'Processing...' : 'Unpledge All'}
                     </Button>
                     <Button
-                      className="rounded-full text-sm"
+                      className="w-full rounded-full text-xs sm:text-sm"
                       onClick={handleRefund}
                       disabled={!canRefund || isProcessing}
                     >
@@ -659,23 +659,23 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
             </Card>
           )}
 
-          <Card className="rounded-[28px] border-0 bg-white p-6 shadow-lg shadow-blue-950/5 ring-1 ring-slate-900/5">
+          <Card className="w-full max-w-full rounded-[28px] border-0 bg-white p-4 shadow-lg shadow-blue-950/5 ring-1 ring-slate-900/5 sm:p-6">
             <CardHeader className="px-0">
-              <CardTitle className="text-lg font-semibold text-slate-900">
+              <CardTitle className="text-base font-semibold text-slate-900 sm:text-lg">
                 Project Creator Information
               </CardTitle>
             </CardHeader>
-            <CardContent className="px-0 text-sm text-slate-500">
-              <dl className="space-y-4">
+            <CardContent className="px-0 text-xs text-slate-500 sm:text-sm">
+              <dl className="space-y-3 sm:space-y-4">
                 <div className="space-y-1">
                   <dt className="text-xs uppercase tracking-wide text-slate-400">Project Owner</dt>
-                  <dd className="break-words font-medium text-slate-900">{project.creator}</dd>
+                  <dd className="break-all font-medium text-slate-900">{project.creator}</dd>
                 </div>
                 <div className="space-y-1">
                   <dt className="text-xs uppercase tracking-wide text-slate-400">
                     Project Creator Address
                   </dt>
-                  <dd className="break-words font-medium text-slate-900" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                  <dd className="break-all font-medium text-slate-900" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                     {project.owner}
                   </dd>
                 </div>
