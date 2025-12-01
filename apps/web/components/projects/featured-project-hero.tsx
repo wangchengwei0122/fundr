@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,9 +34,11 @@ export function FeaturedProjectHero({ project }: FeaturedProjectHeroProps) {
   return (
     <section className="grid gap-8 rounded-[32px] bg-white p-6 shadow-xl shadow-blue-950/5 ring-1 ring-slate-900/5 lg:grid-cols-[1.1fr_1fr]">
       <div className="relative overflow-hidden rounded-[24px] bg-slate-100">
-        <img
+        <Image
           src={project.imageUrl}
           alt={project.title}
+          width={800}
+          height={600}
           className="h-full w-full rounded-[24px] object-cover"
         />
         <span className="absolute left-6 top-6 inline-flex items-center rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-slate-700 shadow-sm">

@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
+import Image from 'next/image';
 import type { Address, Hash } from 'viem';
 import { formatEther, parseEther } from 'viem';
 import { useAccount, useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
@@ -298,9 +299,11 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
   return (
     <article className="space-y-10">
       <div className="overflow-hidden rounded-[32px] bg-white shadow-xl shadow-blue-950/5 ring-1 ring-slate-900/5">
-        <img
+        <Image
           src={project.imageUrl}
           alt={project.title}
+          width={1200}
+          height={500}
           className="h-auto w-full max-h-[500px] object-cover"
         />
       </div>

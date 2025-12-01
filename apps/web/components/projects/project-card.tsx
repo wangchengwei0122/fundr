@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 import type { ProjectSummary } from './types';
 
@@ -52,9 +53,11 @@ export function ProjectCard({ project }: ProjectCardProps) {
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-[28px] bg-white shadow-lg shadow-blue-950/5 ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
       <div className="relative aspect-[16/11] w-full overflow-hidden">
-        <img
+        <Image
           src={project.imageUrl}
           alt={project.title}
+          width={800}
+          height={550}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         <span className="absolute left-5 top-5 inline-flex items-center rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-slate-700 shadow-sm">

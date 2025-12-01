@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAccount, useBalance } from 'wagmi';
 import { formatUnits } from 'viem';
 
@@ -36,9 +37,11 @@ function ProjectCard({ campaign }: ProjectCardProps) {
     <article className="group flex flex-col gap-5 rounded-3xl bg-white p-6 shadow-lg shadow-slate-900/5 ring-1 ring-slate-900/5 transition hover:-translate-y-1 hover:shadow-xl">
       <div className="flex items-start gap-4">
         <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-slate-100">
-          <img
+          <Image
             src={campaign.imageUrl}
             alt={campaign.title}
+            width={80}
+            height={80}
             className="h-full w-full object-cover"
           />
         </div>
@@ -134,7 +137,7 @@ export default function AccountPage() {
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-6">
             <div className="h-20 w-20 overflow-hidden rounded-full bg-slate-100">
-              <img src={profile.avatar} alt="Profile" className="h-full w-full object-cover" />
+              <Image src={profile.avatar} alt="Profile" width={80} height={80} className="h-full w-full object-cover" />
             </div>
             <div className="space-y-2">
               <h1 className="text-2xl font-semibold text-slate-900">

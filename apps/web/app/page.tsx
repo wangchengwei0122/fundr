@@ -96,11 +96,7 @@ export default function HomePage() {
         {isLoading && projects.length === 0 ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
             {Array.from({ length: 3 }).map((_, index) => (
-              <div
-                // eslint-disable-next-line react/no-array-index-key
-                key={index}
-                className="h-64 animate-pulse rounded-[28px] bg-slate-200/60"
-              />
+              <div key={index} className="h-64 animate-pulse rounded-[28px] bg-slate-200/60" />
             ))}
           </div>
         ) : (

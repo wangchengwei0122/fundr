@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import type { FormEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Address, Hash } from 'viem';
@@ -33,7 +32,6 @@ export default function CreatePage() {
   const factoryAddress = useMemo(resolveFactory, []);
   const { isConnected } = useAccount();
   const publicClient = usePublicClient();
-  const router = useRouter();
 
   const [txHash, setTxHash] = useState<Hash | null>(null);
   const [formError, setFormError] = useState<string | null>(null);

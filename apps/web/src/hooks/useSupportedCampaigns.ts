@@ -164,7 +164,7 @@ async function fetchSupportedCampaigns(
             }),
           ]);
 
-          const [creator, goal, deadline, statusIndex, totalPledged] = summary as [
+          const [, goal, , statusIndex, totalPledged] = summary as [
             Address,
             bigint,
             bigint,

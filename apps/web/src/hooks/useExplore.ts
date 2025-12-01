@@ -133,7 +133,7 @@ function toEth(value: string) {
     const whole = Number(wei / WEI_PER_ETH);
     const fraction = Number(wei % WEI_PER_ETH) / 1e18;
     return whole + fraction;
-  } catch (error) {
+  } catch {
     return 0;
   }
 }
@@ -145,7 +145,7 @@ function computeProgress(goal: string, pledged: string) {
     const pledgedWei = BigInt(pledged);
     const ratio = Number((pledgedWei * 10000n) / goalWei) / 10000;
     return Math.max(0, Math.min(1, ratio));
-  } catch (error) {
+  } catch {
     return 0;
   }
 }

@@ -82,7 +82,7 @@ function requireBigInt(key: EnvKey) {
   const value = requireEnv(key);
   try {
     return BigInt(value);
-  } catch (error) {
+  } catch {
     throw new Error(`${key} must be a valid integer`);
   }
 }
@@ -187,7 +187,7 @@ async function fetchDirectOnChain(limit: number, cursor: number): Promise<Campai
         ],
       });
       return { summary, metadata };
-    } catch (e) {
+    } catch {
       // Fallback when chain doesn't support multicall or other errors
       const [summary, metadata] = await Promise.all([
         client.readContract({ address, abi: campaignAbi, functionName: 'getSummary' }),
