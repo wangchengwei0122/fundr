@@ -51,9 +51,11 @@ export function FeaturedProjectHero({ project }: FeaturedProjectHeroProps) {
           <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
             {project.title}
           </h1>
-          <p className="text-base leading-relaxed text-slate-600">{project.summary}</p>
-          <p className="text-sm text-slate-500">
-            Created by <span className="font-medium text-slate-900">{project.creator}</span>
+          <p className="line-clamp-2 min-h-[3rem] text-base leading-relaxed text-slate-600">
+            {project.summary}
+          </p>
+          <p className="break-words text-sm text-slate-500">
+            Created by <span className="font-medium text-slate-900 break-words">{project.creator}</span>
           </p>
         </div>
 
@@ -73,13 +75,6 @@ export function FeaturedProjectHero({ project }: FeaturedProjectHeroProps) {
         <div className="flex flex-wrap gap-3">
           <Button asChild className="rounded-full px-6 text-sm">
             <Link href={`/projects/${project.id}`}>Support Project</Link>
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-            className="rounded-full border-slate-200 bg-white px-6 text-sm text-slate-700 hover:bg-slate-100"
-          >
-            <Link href={`/projects/${project.id}`}>Learn More</Link>
           </Button>
         </div>
       </div>

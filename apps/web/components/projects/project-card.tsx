@@ -26,7 +26,7 @@ function formatEth(value: number) {
   if (!Number.isFinite(value)) {
     return '0 ETH';
   }
-  return `${value.toLocaleString('zh-CN', { maximumFractionDigits: 2 })} ETH`;
+  return `${value.toLocaleString('en-US', { maximumFractionDigits: 2 })} ETH`;
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
@@ -69,11 +69,13 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
       <div className="flex flex-1 flex-col gap-6 p-6">
         <div className="space-y-3">
-          <p className="text-sm text-slate-500">
-            By <span className="font-medium text-slate-900">{project.creator}</span>
+          <p className="break-words text-sm text-slate-500">
+            By <span className="font-medium text-slate-900 break-words">{project.creator}</span>
           </p>
           <h3 className="text-xl font-semibold text-slate-900">{project.title}</h3>
-          <p className="text-sm leading-relaxed text-slate-600">{project.summary}</p>
+          <p className="line-clamp-2 min-h-[2.5rem] text-sm leading-relaxed text-slate-600">
+            {project.summary}
+          </p>
         </div>
 
         <div className="space-y-3">
