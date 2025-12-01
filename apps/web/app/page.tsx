@@ -54,33 +54,39 @@ export default function HomePage() {
   const featured = sortedProjects[0] ?? FALLBACK_FEATURED;
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 py-12">
+    <main className="mx-auto flex w-full max-w-full flex-col gap-8 overflow-x-hidden px-4 py-8 sm:max-w-6xl sm:gap-12 sm:px-6 sm:py-12">
       <FeaturedProjectHero project={featured} />
 
-      <section className="space-y-6">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight text-slate-900">Discover</h2>
-            <p className="text-sm text-slate-500">
+      <section className="w-full max-w-full space-y-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="w-full max-w-full">
+            <h2 className="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl">
+              Discover
+            </h2>
+            <p className="mt-1 text-xs text-slate-500 sm:text-sm">
               Discover high-quality projects initiated by the selected communities and find a
               mission that resonates with you.
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex rounded-full bg-slate-100 p-1">
+          <div className="flex w-full max-w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center sm:gap-2">
+            <div className="flex w-full max-w-full overflow-x-auto rounded-full bg-slate-100 p-1 sm:w-auto">
               {sortTabs.map((tab) => (
                 <button
                   key={tab.key}
                   type="button"
                   onClick={() => setSortKey(tab.key)}
-                  className={`rounded-full px-4 py-1 text-sm font-medium transition ${sortKey === tab.key ? 'bg-white shadow-sm' : 'text-slate-500'}`}
+                  className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium transition sm:px-4 sm:text-sm ${sortKey === tab.key ? 'bg-white shadow-sm' : 'text-slate-500'}`}
                   disabled={sortKey === tab.key}
                 >
                   {tab.label}
                 </button>
               ))}
             </div>
-            <Button asChild variant="outline" className="rounded-full px-5">
+            <Button
+              asChild
+              variant="outline"
+              className="w-full rounded-full px-5 text-sm sm:w-auto"
+            >
               <Link href="/projects">View All</Link>
             </Button>
           </div>
@@ -104,16 +110,16 @@ export default function HomePage() {
         )}
 
         {projects.length > 0 && (
-          <div className="flex flex-col gap-3">
+          <div className="flex w-full max-w-full flex-col gap-3">
             <p className="text-xs text-slate-400">
               Data source: {source === 'edge' ? 'Edge Cache' : 'Chain Fallback'}
             </p>
-            <div className="flex items-center justify-center">
+            <div className="flex w-full max-w-full items-center justify-center">
               <Button
                 onClick={loadMore}
                 disabled={!hasMore || isLoading}
                 variant="outline"
-                className="rounded-full px-6"
+                className="w-full rounded-full px-6 sm:w-auto"
               >
                 {hasMore ? (isLoading ? 'Loading...' : 'Load More') : 'No more projects'}
               </Button>
