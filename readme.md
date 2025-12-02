@@ -1,57 +1,112 @@
-# Web3 Kickstarter Portfolio
+# Fundr
 
-This repo is my interview-grade proof of building a full Web3 data stack:
-- **Indexer-first data sourcing** powered by `apps/indexer` and Drizzle.
-- **Fastify API** that is the single source of truth for the UI and edge cache.
-- **Cloudflare Edge worker** that sits between the API and the Next.js UI for cache-friendly delivery.
-- **Next.js 15 App Router frontend** that never talks to the blockchain directly.
+A decentralized crowdfunding platform built on Web3 with an indexer-first data architecture.
 
-## Why this demo?
-- Demonstrates a multi-service, pnpm workspace architecture while keeping web/edge clients strictly read-only.
-- Highlights how I wired an end-to-end flow around campaigns, checkpoints, pagination, sorting, caching, and metadata pinning.
-- Shows discipline around tooling (Foundry contracts, Drizzle schema, viem + wagmi, Wrangler, and reproducible scripts for ABI/address sync).
+**Live Demo**: [https://fundr-web.vercel.app/](https://fundr-web.vercel.app/)
 
-## Architecture at a glance
+## Overview
 
-`Blockchain → apps/indexer (viem) → PostgreSQL (packages/db) → apps/api (Fastify + Drizzle) → apps/edge (Cloudflare KV cache) → apps/web (Next.js 15 App Router)`
+Fundr is a complete Web3 crowdfunding data stack with the following core components:
 
-Every outward-facing client—`apps/web` and `apps/edge`—only reads from `apps/api`, and only `apps/indexer` ever touches the blockchain.
+- **Indexer-first data sourcing** - Chain data indexing via `apps/indexer` and Drizzle ORM
+- **Fastify API** - Single source of truth for frontend and edge cache
+- **Cloudflare Edge Worker** - Caching layer between API and Next.js UI
+- **Next.js 15 Frontend** - App Router implementation that never interacts with blockchain directly
 
-## Module guide
+## Architecture
 
-- **apps/indexer** – WebSocket-indexed campaign and checkpoint ingestion that writes clean, normalized rows to PostgreSQL. Includes batching, retry/backoff, checkpoints, and periodic refreshes.
-- **packages/db** – Shared Drizzle schema (campaigns + checkpoints) so the indexer and API always stay in sync.
-- **apps/api** – Fastify REST API that wraps Drizzle queries, offers filtering/pagination, and is the single data source for frontend + edge.
-- **apps/edge** – Cloudflare Worker that proxies to the API, implements KV read-through caching, and keeps logic intentionally thin (no blockchain access).
-- **apps/web** – Next.js 15 UI that uses React Query + wagmi + viem for wallet interactions and relies on the Edge worker for all reads.
-- **packages/contracts** – Foundry contracts plus scripts whose ABI outputs are synchronized across the workspace so every consumer knows the deployed addresses.
-- **scripts/** – Helpers for ABI/address sync, migrations, deployments, and environment setup.
+Data flow: `Blockchain → apps/indexer (viem) → PostgreSQL (packages/db) → apps/api (Fastify + Drizzle) → apps/edge (Cloudflare KV) → apps/web (Next.js 15)`
 
-## Getting started
+Core principles:
+
+- `apps/web` and `apps/edge` only read from `apps/api`
+- Only `apps/indexer` interacts with the blockchain
+- API layer is the single data source for frontend and edge
+
+## Modules
+
+- **apps/indexer** - WebSocket indexing service that listens to on-chain events and writes to PostgreSQL. Includes batching, retry/backoff, checkpoints, and periodic refresh mechanisms
+- **packages/db** - Shared Drizzle database schema (campaigns + checkpoints) ensuring data consistency between indexer and API
+- **apps/api** - Fastify REST API that wraps Drizzle queries, provides filtering/pagination, and serves as the single data source for frontend and edge
+- **apps/edge** - Cloudflare Worker that proxies API requests, implements KV read-through caching, keeping logic minimal (no blockchain access)
+- **apps/web** - Next.js 15 frontend using React Query + wagmi + viem for wallet interactions, all data reads go through Edge Worker
+- **packages/contracts** - Foundry smart contracts with ABI outputs synchronized across the workspace
+- **scripts/** - Helper scripts for ABI/address sync, database migrations, deployments, and environment configuration
+
+## Getting Started
+
+### Install Dependencies
 
 ```bash
 pnpm install
+```
+
+### Start Development Environment
+
+```bash
 pnpm dev
 ```
 
-`pnpm dev` orchestrates the full stack for local work. You can also target each slice individually:
+`pnpm dev` starts the full stack. You can also start individual services:
 
-1. `pnpm dev:web` – Start the Next.js frontend.
-2. `pnpm dev:edge` – Run `wrangler dev` for the Cloudflare Worker.
-3. `pnpm --filter @apps/api dev` – Start the Fastify API server.
-4. `pnpm --filter @apps/indexer dev` – Launch the campaign indexer.
+- `pnpm dev:web` - Start Next.js frontend
+- `pnpm dev:edge` - Start Cloudflare Worker (wrangler dev)
+- `pnpm --filter @apps/api dev` - Start Fastify API server
+- `pnpm --filter @apps/indexer dev` - Start crowdfunding indexer
 
-Ensure the shared environment variables (e.g., `DATABASE_URL`, `NEXT_PUBLIC_EDGE`, `NEXT_PUBLIC_FACTORY`, `NEXT_PUBLIC_RPC_URL`, `NEXT_PUBLIC_CHAIN_ID`, `NEXT_PUBLIC_DEPLOY_BLOCK`) stay consistent across services. The `scripts/` folder contains helpers for ABI/address sync and other deployment routines.
+### Environment Variables
 
-## Showcase summary
+Ensure the following environment variables are consistent across services:
 
-- **Live-synced campaigns** – Indexer listens for `CampaignCreated`, hydrates goal/deadline, checkpoints `campaigns` + `checkpoints`, and API enriches the response with creator metrics.
-- **Edge caching layer** – Cloudflare Worker adds KV read-through caching so the UI loads fast while the API remains authoritative.
-- **Modern frontend** – Next.js 15 App Router with server components, tailwind, React Query, wagmi, and viem for wallet interactions and metadata uploads.
-- **Contracts + tooling** – Foundry + scripts keep ABI/address deployments in sync and drive deterministic builds for interviews.
+- `DATABASE_URL` - PostgreSQL database connection string
+- `NEXT_PUBLIC_EDGE` - Edge Worker URL
+- `NEXT_PUBLIC_FACTORY` - CampaignFactory contract address
+- `NEXT_PUBLIC_RPC_URL` - Blockchain RPC endpoint
+- `NEXT_PUBLIC_CHAIN_ID` - Chain ID
+- `NEXT_PUBLIC_DEPLOY_BLOCK` - Contract deployment block number
 
-## Next steps
+## Core Features
 
-1. Run `pnpm --filter @packages/contracts test` or `forge test` when touching contracts.
-2. Push Drizzle schema updates with `pnpm db:generate` + `pnpm db:push`.
-3. Deploy the API, edge worker, and indexer so you can demo the flow end-to-end.
+- **Real-time synced campaigns** - Indexer listens for `CampaignCreated` events, extracts goal/deadline, and writes data to `campaigns` and `checkpoints` tables
+- **Edge caching layer** - Cloudflare Worker provides KV read-through caching for faster UI loads
+- **Modern frontend** - Next.js 15 App Router with server components, Tailwind CSS, React Query, wagmi, and viem
+- **Smart contracts & tooling** - Foundry contracts and scripts ensure ABI/address deployment synchronization
+
+## Development Guide
+
+### Smart Contracts
+
+```bash
+# Run tests
+pnpm --filter @packages/contracts test
+# or
+forge test
+
+# Build contracts
+pnpm contracts:build
+
+# Deploy locally
+pnpm contracts:deploy:local:auto
+
+# Deploy to Sepolia
+pnpm contracts:deploy:sepolia
+```
+
+### Database Migrations
+
+```bash
+# Generate migration files
+pnpm db:generate
+
+# Push migrations to database
+pnpm db:push
+```
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, React, TypeScript, Tailwind CSS, wagmi, viem
+- **Backend**: Fastify, Drizzle ORM, PostgreSQL
+- **Indexer**: Node.js, viem (WebSocket), Drizzle ORM
+- **Edge**: Cloudflare Workers, KV
+- **Smart Contracts**: Foundry, Solidity 0.8.30
+- **Tooling**: pnpm workspaces, TypeScript
