@@ -41,6 +41,19 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* Status semantic colors */
+  --color-status-active-bg: var(--status-active-bg);
+  --color-status-active-text: var(--status-active-text);
+  --color-status-successful-bg: var(--status-successful-bg);
+  --color-status-successful-text: var(--status-successful-text);
+  --color-status-failed-bg: var(--status-failed-bg);
+  --color-status-failed-text: var(--status-failed-text);
+
+  /* Asset colors */
+  --color-asset-eth: var(--asset-eth);
+  --color-asset-success: var(--asset-success);
+  --color-asset-warning: var(--asset-warning);
 }
 
 :root {
@@ -76,6 +89,19 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Status semantic colors */
+  --status-active-bg: oklch(0.95 0.03 250);
+  --status-active-text: oklch(0.50 0.18 250);
+  --status-successful-bg: oklch(0.95 0.03 145);
+  --status-successful-text: oklch(0.45 0.15 145);
+  --status-failed-bg: oklch(0.96 0.03 25);
+  --status-failed-text: oklch(0.55 0.18 25);
+
+  /* Asset colors */
+  --asset-eth: oklch(0.58 0.18 250);
+  --asset-success: oklch(0.72 0.17 145);
+  --asset-warning: oklch(0.82 0.16 85);
 }
 
 .dark {

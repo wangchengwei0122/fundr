@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { ProjectList } from '@/components/projects/project-list';
-import type { ProjectSummary } from '@/components/projects/types';
 import { useExplore } from '@/src/hooks/useExplore';
 
 const sortTabs = [

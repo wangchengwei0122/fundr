@@ -1,124 +1,19 @@
 'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAccount, useBalance } from 'wagmi';
 import { formatUnits } from 'viem';
 
 import { Button } from '@/components/ui/button';
+import { PageShell } from '@/components/blocks/layout/page-shell';
+import { Section } from '@/components/blocks/layout/section';
+import { IdentityHeader } from '@/components/blocks/identity/identity-header';
+import { AssetCard } from '@/components/blocks/display/asset-card';
 import { useUserCampaigns, type CampaignInfo } from '@/src/hooks/useUserCampaigns';
 import { useSupportedCampaigns } from '@/src/hooks/useSupportedCampaigns';
-
-const profile = {
-  avatar:
-    'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=240&q=80',
-  bio: 'Exploring new possibilities in Web3 crowdfunding, focusing on sustainability and creative technology.',
-};
-
-type ProjectCardProps = {
-  campaign: CampaignInfo;
-};
-
-function ProjectCard({ campaign }: ProjectCardProps) {
-  const statusColors: Record<CampaignInfo['status'], string> = {
-    active: 'bg-blue-100 text-blue-600',
-    successful: 'bg-emerald-100 text-emerald-600',
-    failed: 'bg-rose-100 text-rose-600',
-    cancelled: 'bg-slate-100 text-slate-500',
-  };
-
-  const statusLabels: Record<CampaignInfo['status'], string> = {
-    active: 'In Progress',
-    successful: 'Successful',
-    failed: 'Failed',
-    cancelled: 'Cancelled',
-  };
-
-  return (
-    <article className="group flex w-full max-w-full flex-col gap-4 rounded-3xl bg-white p-4 shadow-lg shadow-slate-900/5 ring-1 ring-slate-900/5 transition hover:-translate-y-1 hover:shadow-xl sm:gap-5 sm:p-6">
-      <div className="flex w-full max-w-full items-start gap-3 sm:gap-4">
-        <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-slate-100 sm:h-20 sm:w-20">
-          <Image
-            src={campaign.imageUrl}
-            alt={campaign.title}
-            width={80}
-            height={80}
-            className="h-full w-full object-cover"
-          />
-        </div>
-        <div className="min-w-0 flex-1 space-y-2">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-medium uppercase tracking-wide text-sky-500">
-              {campaign.category}
-            </span>
-            <span
-              className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusColors[campaign.status]}`}
-            >
-              {statusLabels[campaign.status]}
-            </span>
-          </div>
-          <h3 className="break-words text-base font-semibold text-slate-900 sm:text-lg">
-            {campaign.title}
-          </h3>
-          <p className="line-clamp-2 text-xs text-slate-500 sm:text-sm">{campaign.description}</p>
-          <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400 sm:gap-4">
-            <span className="break-words">
-              Progress: {Math.round(campaign.progress * 100)}% · Pledged{' '}
-              {campaign.pledgedAmount.toFixed(4)} ETH
-            </span>
-          </div>
-        </div>
-      </div>
-      <div className="w-full max-w-full">
-        <Button
-          asChild
-          variant="outline"
-          className="w-full rounded-full px-4 py-2 text-sm sm:w-auto"
-        >
-          <Link href={`/projects/${campaign.address}`}>View Project</Link>
-        </Button>
-      </div>
-    </article>
-  );
-}
-
-function ProjectSection({
-  title,
-  campaigns,
-  isLoading,
-}: {
-  title: string;
-  campaigns: CampaignInfo[];
-  isLoading: boolean;
-}) {
-  return (
-    <section className="w-full max-w-full space-y-5">
-      <div className="flex w-full max-w-full items-center justify-between">
-        <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">{title}</h2>
-        {campaigns.length > 0 && (
-          <Button
-            variant="ghost"
-            className="text-xs text-slate-500 hover:text-slate-900 sm:text-sm"
-          >
-            View All
-          </Button>
-        )}
-      </div>
-      {isLoading ? (
-        <div className="py-8 text-center text-xs text-slate-500 sm:text-sm">Loading...</div>
-      ) : campaigns.length === 0 ? (
-        <div className="w-full max-w-full rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center sm:p-8">
-          <p className="text-xs text-slate-500 sm:text-sm">No projects</p>
-        </div>
-      ) : (
-        <div className="grid w-full max-w-full grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
-          {campaigns.map((campaign) => (
-            <ProjectCard key={campaign.address} campaign={campaign} />
-          ))}
-        </div>
-      )}
-    </section>
-  );
-}
+import { formatEth } from '@/lib/format';
+import { PROJECT_STATUS_STYLES, PROJECT_STATUS_LABELS } from '@/lib/constants';
 
 export default function AccountPage() {
   const { address, isConnected } = useAccount();
@@ -128,66 +23,235 @@ export default function AccountPage() {
     useSupportedCampaigns(address);
   const { data: userCampaigns = [], isLoading: isLoadingUser } = useUserCampaigns(address);
 
+  // Calculate stats
+  const totalPledged = supportedCampaigns.reduce((sum, c) => sum + c.pledgedAmount, 0);
+  const totalRaised = userCampaigns.reduce((sum, c) => sum + c.pledgedAmount, 0);
+
   if (!isConnected || !address) {
     return (
-      <main className="mx-auto flex w-full max-w-full flex-col gap-8 overflow-x-hidden px-4 py-4 sm:max-w-6xl sm:gap-12 sm:px-6 sm:py-6">
-        <section className="w-full max-w-full rounded-[32px] bg-white p-6 shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5 sm:p-8">
-          <div className="py-8 text-center">
-            <p className="text-xs text-slate-500 sm:text-sm">
-              Please connect your wallet to view your account information
+      <PageShell>
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <div className="rounded-[32px] bg-white p-8 text-center shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5 sm:p-12">
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
+              <svg
+                className="h-8 w-8 text-slate-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"
+                />
+              </svg>
+            </div>
+            <h2 className="text-xl font-semibold text-slate-900">Connect Your Wallet</h2>
+            <p className="mt-2 text-sm text-slate-500">
+              Connect your wallet to view your on-chain identity and activity
             </p>
           </div>
-        </section>
-      </main>
+        </div>
+      </PageShell>
     );
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-full flex-col gap-8 overflow-x-hidden px-4 py-4 sm:max-w-6xl sm:gap-12 sm:px-6 sm:py-6">
-      <section className="w-full max-w-full rounded-[32px] bg-white p-4 shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5 sm:p-8">
-        <div className="flex w-full max-w-full flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex w-full max-w-full items-center gap-4 sm:gap-6">
-            <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-slate-100 sm:h-20 sm:w-20">
-              <Image
-                src={profile.avatar}
-                alt="Profile"
-                width={80}
-                height={80}
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <div className="min-w-0 flex-1 space-y-1 sm:space-y-2">
-              <h1 className="break-all text-xl font-semibold text-slate-900 sm:text-2xl">
-                {address.slice(0, 6)}...{address.slice(-4)}
-              </h1>
-              <p className="break-words text-xs text-slate-500 sm:text-sm">
-                Balance: {balance ? formatUnits(balance.value, balance.decimals) : '—'}{' '}
-                {balance?.symbol}
-              </p>
-              <p className="break-all text-xs text-slate-400">{address}</p>
-            </div>
-          </div>
-          <div className="flex w-full max-w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center sm:gap-3">
-            <Button variant="outline" className="w-full rounded-full px-5 sm:w-auto" disabled>
+    <PageShell className="space-y-8 sm:space-y-12">
+      {/* Identity Header */}
+      <IdentityHeader
+        address={address}
+        balance={
+          balance
+            ? {
+                value: Number(formatUnits(balance.value, balance.decimals)).toFixed(4),
+                symbol: balance.symbol,
+              }
+            : undefined
+        }
+        actions={
+          <>
+            <Button variant="outline" className="rounded-full" disabled>
               Edit Profile
             </Button>
-            <Button asChild className="w-full rounded-full px-5 sm:w-auto">
-              <Link href="/create">Create Project</Link>
+            <Button asChild className="rounded-full">
+              <Link href="/create">Create Campaign</Link>
             </Button>
-          </div>
-        </div>
-      </section>
+          </>
+        }
+      />
 
-      <ProjectSection
-        title="Projects I Supported"
-        campaigns={supportedCampaigns}
-        isLoading={isLoadingSupported}
-      />
-      <ProjectSection
-        title="Projects I Created"
-        campaigns={userCampaigns}
-        isLoading={isLoadingUser}
-      />
-    </main>
+      {/* Stats Grid */}
+      <Section>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <AssetCard
+            title="Total Pledged"
+            value={formatEth(totalPledged)}
+            subValue={`${supportedCampaigns.length} campaigns`}
+            variant="highlight"
+          />
+          <AssetCard
+            title="Total Raised"
+            value={formatEth(totalRaised)}
+            subValue={`${userCampaigns.length} campaigns`}
+          />
+          <AssetCard
+            title="Activity Score"
+            value={(supportedCampaigns.length + userCampaigns.length * 2).toString()}
+            subValue="Based on contributions"
+          />
+        </div>
+      </Section>
+
+      {/* My Campaigns */}
+      <Section
+        title="My Campaigns"
+        description="Campaigns you have created"
+        action={
+          userCampaigns.length > 4 && (
+            <Button variant="ghost" size="sm" className="text-slate-500">
+              View All
+            </Button>
+          )
+        }
+      >
+        {isLoadingUser ? (
+          <LoadingGrid />
+        ) : userCampaigns.length === 0 ? (
+          <EmptyState
+            message="You haven't created any campaigns yet"
+            action={
+              <Button asChild className="mt-4 rounded-full">
+                <Link href="/create">Create Your First Campaign</Link>
+              </Button>
+            }
+          />
+        ) : (
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
+            {userCampaigns.slice(0, 4).map((campaign) => (
+              <CampaignCard key={campaign.address} campaign={campaign} />
+            ))}
+          </div>
+        )}
+      </Section>
+
+      {/* Campaigns I Backed */}
+      <Section
+        title="Campaigns I Backed"
+        description="Projects you have supported"
+        action={
+          supportedCampaigns.length > 4 && (
+            <Button variant="ghost" size="sm" className="text-slate-500">
+              View All
+            </Button>
+          )
+        }
+      >
+        {isLoadingSupported ? (
+          <LoadingGrid />
+        ) : supportedCampaigns.length === 0 ? (
+          <EmptyState
+            message="You haven't backed any campaigns yet"
+            action={
+              <Button asChild variant="outline" className="mt-4 rounded-full">
+                <Link href="/projects">Explore Campaigns</Link>
+              </Button>
+            }
+          />
+        ) : (
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
+            {supportedCampaigns.slice(0, 4).map((campaign) => (
+              <CampaignCard key={campaign.address} campaign={campaign} />
+            ))}
+          </div>
+        )}
+      </Section>
+    </PageShell>
+  );
+}
+
+// Campaign Card Component
+function CampaignCard({ campaign }: { campaign: CampaignInfo }) {
+  const hasReachedGoal = campaign.goalAmount > 0 && campaign.pledgedAmount >= campaign.goalAmount;
+  const derivedStatus = campaign.status === 'active' && hasReachedGoal ? 'successful' : campaign.status;
+
+  return (
+    <Link
+      href={`/projects/${campaign.address}`}
+      className="group flex gap-4 rounded-[24px] bg-white p-4 shadow-lg shadow-slate-900/5 ring-1 ring-slate-900/5 transition hover:-translate-y-1 hover:shadow-xl sm:p-5"
+    >
+      <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:h-20 sm:w-20">
+        <Image
+          src={campaign.imageUrl}
+          alt={campaign.title}
+          width={80}
+          height={80}
+          className="h-full w-full object-cover transition-transform group-hover:scale-105"
+        />
+      </div>
+      <div className="min-w-0 flex-1 space-y-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-medium uppercase tracking-wide text-primary">
+            {campaign.category}
+          </span>
+          <span
+            className={`rounded-full px-2 py-0.5 text-xs font-medium ${PROJECT_STATUS_STYLES[derivedStatus]}`}
+          >
+            {PROJECT_STATUS_LABELS[derivedStatus]}
+          </span>
+        </div>
+        <h3 className="line-clamp-1 text-base font-semibold text-slate-900 group-hover:text-primary sm:text-lg">
+          {campaign.title}
+        </h3>
+        <div className="flex items-center gap-4 text-xs text-slate-500">
+          <span>{Math.round(campaign.progress * 100)}% funded</span>
+          <span>{formatEth(campaign.pledgedAmount)}</span>
+        </div>
+        {/* Progress bar */}
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+          <div
+            className="h-full rounded-full bg-primary/80"
+            style={{ width: `${Math.min(100, Math.round(campaign.progress * 100))}%` }}
+          />
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+// Loading Grid
+function LoadingGrid() {
+  return (
+    <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
+      {[1, 2].map((i) => (
+        <div
+          key={i}
+          className="h-32 animate-pulse rounded-[24px] bg-slate-200/60"
+        />
+      ))}
+    </div>
+  );
+}
+
+// Empty State
+function EmptyState({
+  message,
+  action,
+}: {
+  message: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-[24px] border-2 border-dashed border-slate-200 bg-slate-50/50 p-8 text-center">
+      <p className="text-sm text-slate-500">{message}</p>
+      {action}
+    </div>
   );
 }

@@ -2,12 +2,19 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
+import { PageShell } from '@/components/blocks/layout/page-shell';
+import { Section } from '@/components/blocks/layout/section';
+import { HeroBlock } from '@/components/blocks/display/hero-block';
+import { StatBlock } from '@/components/blocks/display/stat-block';
 import { ProjectList } from '@/components/projects/project-list';
 import type { ProjectSummary } from '@/components/projects/types';
-import { FeaturedProjectHero } from '@/components/projects/featured-project-hero';
 import { useExplore } from '@/src/hooks/useExplore';
+import { formatEth, getDaysLeft, getProgress } from '@/lib/format';
+import { PROJECT_STATUS_STYLES, PROJECT_STATUS_LABELS, PLATFORM_STATS } from '@/lib/constants';
+import { Badge } from '@/components/ui/badge';
 
 const FALLBACK_FEATURED: ProjectSummary = {
   id: 'eco-farm',
@@ -52,24 +59,77 @@ export default function HomePage() {
   }, [projects, sortKey]);
 
   const featured = sortedProjects[0] ?? FALLBACK_FEATURED;
+  const remainingProjects = sortedProjects.slice(1);
 
   return (
-    <main className="mx-auto flex w-full max-w-full flex-col gap-8 overflow-x-hidden px-4 py-4 sm:max-w-6xl sm:gap-12 sm:px-6 sm:py-6">
-      <FeaturedProjectHero project={featured} />
+    <PageShell paddingY="lg" className="space-y-12 sm:space-y-16">
+      {/* Platform Intro Hero */}
+      <HeroBlock
+        badge="Web3 Crowdfunding Protocol"
+        title="Fund the Future, On-Chain"
+        subtitle="Transparent, trustless crowdfunding for creators and builders. Every pledge is verified on the blockchain."
+        variant="gradient"
+        actions={
+          <>
+            <Button size="lg" className="rounded-full px-8" asChild>
+              <Link href="/create">Start a Campaign</Link>
+            </Button>
+            <Button size="lg" variant="outline" className="rounded-full px-8" asChild>
+              <Link href="/projects">Explore Projects</Link>
+            </Button>
+          </>
+        }
+      />
 
-      <section className="w-full max-w-full space-y-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div className="w-full max-w-full">
-            <h2 className="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl">
-              Discover
-            </h2>
-            <p className="mt-1 text-xs text-slate-500 sm:text-sm">
-              Discover high-quality projects initiated by the selected communities and find a
-              mission that resonates with you.
-            </p>
-          </div>
-          <div className="flex w-full max-w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center sm:gap-2">
-            <div className="flex w-full max-w-full overflow-x-auto rounded-full bg-slate-100 p-1 sm:w-auto">
+      {/* Platform Stats */}
+      <Section>
+        <StatBlock
+          layout="grid"
+          stats={[
+            { label: 'Total Raised', value: PLATFORM_STATS.totalRaised, subtext: PLATFORM_STATS.totalRaisedUsd },
+            { label: 'Campaigns', value: PLATFORM_STATS.campaignsCount.toString(), subtext: `Active: ${PLATFORM_STATS.activeCampaigns}` },
+            { label: 'Backers', value: PLATFORM_STATS.backersCount.toLocaleString(), subtext: 'Unique wallets' },
+            { label: 'Success Rate', value: `${PLATFORM_STATS.successRate}%`, subtext: 'Last 90 days' },
+          ]}
+        />
+      </Section>
+
+      {/* Featured Campaign - Custom Design */}
+      <Section title="Featured Campaign">
+        <FeaturedCampaign project={featured} />
+      </Section>
+
+      {/* How Fundr Works */}
+      <Section
+        title="How Fundr Works"
+        description="Transparent crowdfunding in three simple steps"
+      >
+        <div className="grid gap-6 md:grid-cols-3">
+          <StepCard
+            step={1}
+            title="Create"
+            description="Define your goal, deadline, and tell your story. Deploy your campaign as a smart contract."
+          />
+          <StepCard
+            step={2}
+            title="Fund"
+            description="Backers pledge ETH directly to your campaign contract. All transactions are on-chain."
+          />
+          <StepCard
+            step={3}
+            title="Deliver"
+            description="Meet your goal and claim funds. Miss it, backers get automatic refunds."
+          />
+        </div>
+      </Section>
+
+      {/* Active Campaigns */}
+      <Section
+        title="Active Campaigns"
+        description="Discover projects from verified creators"
+        action={
+          <div className="flex items-center gap-3">
+            <div className="flex overflow-hidden rounded-full bg-slate-100 p-1">
               {sortTabs.map((tab) => (
                 <button
                   key={tab.key}
@@ -82,20 +142,15 @@ export default function HomePage() {
                 </button>
               ))}
             </div>
-            <Button
-              asChild
-              variant="outline"
-              className="w-full rounded-full px-5 text-sm sm:w-auto"
-            >
+            <Button asChild variant="outline" className="rounded-full px-5 text-sm">
               <Link href="/projects">View All</Link>
             </Button>
           </div>
-        </div>
-
+        }
+      >
         {isError && (
           <div className="rounded-2xl border border-rose-200 bg-rose-50/80 p-4 text-sm text-rose-700">
-            Worker is temporarily unavailable, trying to fallback directly to chain. Please refresh
-            later.
+            Worker is temporarily unavailable, trying to fallback directly to chain. Please refresh later.
           </div>
         )}
 
@@ -106,27 +161,131 @@ export default function HomePage() {
             ))}
           </div>
         ) : (
-          <ProjectList projects={sortedProjects} />
+          <ProjectList projects={remainingProjects} />
         )}
 
         {projects.length > 0 && (
-          <div className="flex w-full max-w-full flex-col gap-3">
+          <div className="mt-8 flex flex-col items-center gap-3">
+            <Button
+              onClick={loadMore}
+              disabled={!hasMore || isLoading}
+              variant="outline"
+              className="rounded-full px-8"
+            >
+              {hasMore ? (isLoading ? 'Loading...' : 'Load More') : 'No more projects'}
+            </Button>
             <p className="text-xs text-slate-400">
               Data source: {source === 'edge' ? 'Edge Cache' : 'Chain Fallback'}
             </p>
-            <div className="flex w-full max-w-full items-center justify-center">
-              <Button
-                onClick={loadMore}
-                disabled={!hasMore || isLoading}
-                variant="outline"
-                className="w-full rounded-full px-6 sm:w-auto"
-              >
-                {hasMore ? (isLoading ? 'Loading...' : 'Load More') : 'No more projects'}
-              </Button>
-            </div>
           </div>
         )}
-      </section>
-    </main>
+      </Section>
+    </PageShell>
+  );
+}
+
+// Featured Campaign - Custom design, not reusing ProjectCard
+function FeaturedCampaign({ project }: { project: ProjectSummary }) {
+  const progress = getProgress(project.pledgedAmount, project.goalAmount);
+  const daysLeft = getDaysLeft(project.deadline);
+  const hasReachedGoal = project.goalAmount > 0 && project.pledgedAmount >= project.goalAmount;
+  const derivedStatus = project.status === 'active' && hasReachedGoal ? 'successful' : project.status;
+
+  return (
+    <Link
+      href={`/projects/${project.id}`}
+      className="group block overflow-hidden rounded-[32px] bg-white shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5 transition hover:shadow-2xl hover:shadow-slate-900/10"
+    >
+      <div className="grid gap-0 lg:grid-cols-2">
+        {/* Image */}
+        <div className="relative aspect-[16/10] overflow-hidden lg:aspect-auto lg:h-full">
+          <Image
+            src={project.imageUrl}
+            alt={project.title}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+          <div className="absolute left-4 top-4 flex gap-2">
+            <Badge className="rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-slate-700 backdrop-blur-sm">
+              {project.category}
+            </Badge>
+            <Badge
+              className={`rounded-full px-3 py-1 text-xs font-semibold ${PROJECT_STATUS_STYLES[derivedStatus]}`}
+            >
+              {PROJECT_STATUS_LABELS[derivedStatus]}
+            </Badge>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="flex flex-col justify-between p-6 sm:p-8 lg:p-10">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+              Featured
+            </p>
+            <h3 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+              {project.title}
+            </h3>
+            <p className="mt-3 line-clamp-3 text-sm text-slate-600 sm:text-base">
+              {project.summary}
+            </p>
+            <p className="mt-4 text-sm text-slate-500">
+              by <span className="font-medium text-slate-700">{project.creator}</span>
+            </p>
+          </div>
+
+          <div className="mt-6 space-y-4">
+            {/* Progress bar */}
+            <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-sky-500 to-blue-500 transition-all duration-500"
+                style={{ width: `${Math.min(100, Math.round(progress * 100))}%` }}
+              />
+            </div>
+
+            {/* Stats */}
+            <div className="flex items-end justify-between">
+              <div>
+                <p className="text-2xl font-bold text-slate-900 sm:text-3xl">
+                  {formatEth(project.pledgedAmount)}
+                </p>
+                <p className="text-sm text-slate-500">
+                  of {formatEth(project.goalAmount)} goal
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-2xl font-bold text-slate-900 sm:text-3xl">{daysLeft}</p>
+                <p className="text-sm text-slate-500">days left</p>
+              </div>
+            </div>
+
+            <Button className="w-full rounded-full" size="lg">
+              View Campaign
+            </Button>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+// Step Card for "How it works"
+function StepCard({
+  step,
+  title,
+  description,
+}: {
+  step: number;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="rounded-[24px] bg-white p-6 shadow-lg shadow-slate-900/5 ring-1 ring-slate-900/5">
+      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-xl font-bold text-white">
+        {step}
+      </div>
+      <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
+      <p className="mt-2 text-sm text-slate-600">{description}</p>
+    </div>
   );
 }

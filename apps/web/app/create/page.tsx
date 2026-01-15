@@ -8,14 +8,14 @@ import { parseEther, decodeEventLog } from 'viem';
 import { useAccount, usePublicClient, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { PageShell } from '@/components/blocks/layout/page-shell';
+import { Section } from '@/components/blocks/layout/section';
+import { StepIndicator } from '@/components/blocks/form/step-indicator';
+import { FormSection } from '@/components/blocks/form/form-section';
+import { SummaryReview } from '@/components/blocks/form/summary-review';
 import { campaignFactoryAbi } from '@/lib/abi';
-
-const categories = ['Technology', 'Art', 'Education', 'Environment', 'Social Impact', 'Lifestyle'];
-
-const formHint =
-  'Fill in the project information and submit to create a new crowdfunding contract on-chain.';
+import { CREATE_STEPS, PROJECT_CATEGORIES } from '@/lib/constants';
 
 const controlClass =
   'w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 placeholder:text-slate-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100';
@@ -28,11 +28,35 @@ function resolveFactory(): Address {
   return envAddress as Address;
 }
 
+type FormData = {
+  title: string;
+  tagline: string;
+  description: string;
+  goal: string;
+  deadline: string;
+  category: string;
+  cover: string;
+  milestone: string;
+};
+
+const initialFormData: FormData = {
+  title: '',
+  tagline: '',
+  description: '',
+  goal: '',
+  deadline: '',
+  category: PROJECT_CATEGORIES[0],
+  cover: '',
+  milestone: '',
+};
+
 export default function CreatePage() {
   const factoryAddress = useMemo(resolveFactory, []);
   const { isConnected } = useAccount();
   const publicClient = usePublicClient();
 
+  const [currentStep, setCurrentStep] = useState(0);
+  const [formData, setFormData] = useState<FormData>(initialFormData);
   const [txHash, setTxHash] = useState<Hash | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [isUploadingMetadata, setIsUploadingMetadata] = useState(false);
@@ -46,11 +70,9 @@ export default function CreatePage() {
     data: receipt,
   } = useWaitForTransactionReceipt({ hash: txHash ?? undefined });
 
-  // Parse CampaignCreated event from receipt when transaction succeeds
   useEffect(() => {
     if (isSuccess && receipt && publicClient) {
       try {
-        // Find CampaignCreated event in logs
         const campaignCreatedEvent = campaignFactoryAbi.find(
           (item) => item.type === 'event' && item.name === 'CampaignCreated'
         );
@@ -69,7 +91,7 @@ export default function CreatePage() {
                 break;
               }
             } catch {
-              // Continue to next log if this one doesn't match
+              // Continue to next log
             }
           }
         }
@@ -79,52 +101,72 @@ export default function CreatePage() {
     }
   }, [isSuccess, receipt, publicClient]);
 
+  const updateField = useCallback(
+    <K extends keyof FormData>(field: K, value: FormData[K]) => {
+      setFormData((prev) => ({ ...prev, [field]: value }));
+      setFormError(null);
+    },
+    []
+  );
+
+  const validateStep = useCallback((step: number, data: FormData): string | null => {
+    if (step === 0) {
+      if (!data.title.trim()) return 'Please enter a project title.';
+      if (!data.tagline.trim()) return 'Please enter a tagline.';
+      if (!data.description.trim()) return 'Please enter a description.';
+    }
+    if (step === 1) {
+      if (!data.goal.trim() || Number(data.goal) <= 0) return 'Please enter a valid goal amount.';
+      if (!data.deadline.trim()) return 'Please select a deadline.';
+      const deadline = Math.floor(new Date(`${data.deadline}T00:00:00Z`).getTime() / 1000);
+      if (!Number.isFinite(deadline) || deadline <= Math.floor(Date.now() / 1000)) {
+        return 'The deadline must be later than the current time.';
+      }
+    }
+    return null;
+  }, []);
+
+  const handleNext = useCallback(() => {
+    const error = validateStep(currentStep, formData);
+    if (error) {
+      setFormError(error);
+      return;
+    }
+    setFormError(null);
+    setCurrentStep((s) => Math.min(CREATE_STEPS.length - 1, s + 1));
+  }, [currentStep, formData, validateStep]);
+
+  const handleBack = useCallback(() => {
+    setFormError(null);
+    setCurrentStep((s) => Math.max(0, s - 1));
+  }, []);
+
   const handleSubmit = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       setFormError(null);
       setTxHash(null);
 
-      const form = new FormData(event.currentTarget);
-      const title = (form.get('title') as string)?.trim();
-      const tagline = (form.get('tagline') as string)?.trim();
-      const description = (form.get('description') as string)?.trim();
-      const goalInput = (form.get('goal') as string)?.trim();
-      const deadlineInput = (form.get('deadline') as string)?.trim();
-      const categoryInput = (form.get('category') as string)?.trim();
-      const cover = (form.get('cover') as string)?.trim();
-      const milestoneInput = (form.get('milestone') as string)?.trim();
-      const resolvedCategory =
-        categoryInput && categoryInput.length > 0 ? categoryInput : categories[0];
-
-      if (!title || !tagline || !description) {
-        setFormError('Please fill in the project title, tagline, and description.');
-        return;
-      }
-      if (!goalInput || Number(goalInput) <= 0) {
-        setFormError('Please fill in a valid funding goal (ETH).');
-        return;
-      }
-      if (!deadlineInput) {
-        setFormError('Please select a deadline.');
-        return;
-      }
-      const deadline = Math.floor(new Date(`${deadlineInput}T00:00:00Z`).getTime() / 1000);
-      if (!Number.isFinite(deadline) || deadline <= Math.floor(Date.now() / 1000)) {
-        setFormError('The deadline must be later than the current time.');
-        return;
+      // Validate all steps
+      for (let i = 0; i <= currentStep; i++) {
+        const error = validateStep(i, formData);
+        if (error) {
+          setFormError(error);
+          return;
+        }
       }
 
+      const deadline = Math.floor(new Date(`${formData.deadline}T00:00:00Z`).getTime() / 1000);
       let goal: bigint;
       try {
-        goal = parseEther(goalInput);
+        goal = parseEther(formData.goal);
       } catch {
         setFormError('Please enter a valid goal amount (ETH).');
         return;
       }
 
       const milestones =
-        milestoneInput
+        formData.milestone
           ?.split('\n')
           .map((item) => item.trim())
           .filter((item): item is string => item.length > 0) ?? [];
@@ -132,15 +174,15 @@ export default function CreatePage() {
       try {
         const metadataPayload = {
           version: '1.0.0',
-          title,
-          summary: tagline,
-          tagline,
-          description,
-          category: resolvedCategory,
-          ...(cover ? { image: cover, cover } : {}),
+          title: formData.title,
+          summary: formData.tagline,
+          tagline: formData.tagline,
+          description: formData.description,
+          category: formData.category,
+          ...(formData.cover ? { image: formData.cover, cover: formData.cover } : {}),
           ...(milestones.length > 0 ? { milestones } : {}),
           funding: {
-            goalAmountEth: goalInput,
+            goalAmountEth: formData.goal,
             goalAmountWei: goal.toString(),
             currency: 'ETH',
           },
@@ -170,14 +212,13 @@ export default function CreatePage() {
         if (!metadataURI) {
           throw new Error('Metadata upload did not return a valid URI.');
         }
-        console.log('metadataURI', metadataURI);
+
         const hash = await writeContractAsync({
           address: factoryAddress,
           abi: campaignFactoryAbi,
           functionName: 'createCampaign',
           args: [goal, BigInt(deadline), metadataURI],
         });
-        console.log('hash', hash);
         setTxHash(hash);
       } catch (error) {
         if (error instanceof Error) {
@@ -189,272 +230,289 @@ export default function CreatePage() {
         setIsUploadingMetadata(false);
       }
     },
-    [factoryAddress, writeContractAsync]
+    [currentStep, formData, factoryAddress, writeContractAsync, validateStep]
   );
 
   const submitDisabled = !isConnected || isUploadingMetadata || isWriting || isConfirming;
   const submitLabel = isUploadingMetadata
     ? 'Uploading metadata...'
     : isWriting || isConfirming
-      ? 'Submitting...'
-      : isSuccess
-        ? 'Created'
-        : 'Submit Creation';
+      ? 'Creating on blockchain...'
+      : 'Create Campaign';
 
-  return (
-    <main className="mx-auto flex w-full max-w-full flex-col gap-6 overflow-x-hidden px-4 py-4 sm:max-w-6xl sm:gap-10 sm:px-6 sm:py-6">
-      <header className="space-y-2 sm:space-y-3">
-        <p className="text-xs font-semibold uppercase tracking-widest text-sky-500 sm:text-sm">
-          Create
-        </p>
-        <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">Create</h1>
-        <p className="text-xs text-slate-500 sm:text-sm">{formHint}</p>
-      </header>
-
-      <form
-        className="grid gap-6 overflow-x-hidden sm:gap-8"
-        aria-labelledby="create-project-form"
-        onSubmit={handleSubmit}
-      >
-        <Card className="w-full max-w-full rounded-[28px] border-0 bg-white shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5">
-          <CardHeader className="px-4 sm:px-8">
-            <CardTitle className="text-lg text-slate-900 sm:text-xl">Project Overview</CardTitle>
-            <CardDescription className="text-xs text-slate-500 sm:text-sm">
-              Provide title, tagline, and detailed description to help supporters understand your
-              core vision.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4 px-4 pb-6 sm:space-y-6 sm:px-8 sm:pb-8">
-            <div className="grid gap-2">
-              <label className="text-sm font-medium text-slate-700" htmlFor="title">
-                Project Title
-              </label>
-              <Input
-                id="title"
-                name="title"
-                placeholder="e.g., Next-generation Sustainable Energy Battery"
-                className="h-11 rounded-xl px-4"
-              />
-            </div>
-            <div className="grid gap-2">
-              <label className="text-sm font-medium text-slate-700" htmlFor="tagline">
-                Tagline / Brief Introduction
-              </label>
-              <Input
-                id="tagline"
-                name="tagline"
-                placeholder="Tell everyone about your project highlights in one sentence"
-                className="h-11 rounded-xl px-4"
-              />
-            </div>
-            <div className="grid gap-2">
-              <label className="text-sm font-medium text-slate-700" htmlFor="description">
-                Project Details
-              </label>
-              <textarea
-                id="description"
-                name="description"
-                rows={5}
-                placeholder="Expand on project background, vision, and core plans..."
-                className={`${controlClass} resize-none`}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="w-full max-w-full rounded-[28px] border-0 bg-white shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5">
-          <CardHeader className="px-4 sm:px-8">
-            <CardTitle className="text-lg text-slate-900 sm:text-xl">Funding Goal</CardTitle>
-            <CardDescription className="text-xs text-slate-500 sm:text-sm">
-              Set crowdfunding goal amount and key milestones to ensure a clear and credible
-              timeline.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4 px-4 pb-6 sm:space-y-6 sm:px-8 sm:pb-8">
-            <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
-              <div className="grid gap-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="goal">
-                  Goal Amount (ETH)
-                </label>
-                <Input id="goal" name="goal" placeholder="10" className="h-11 rounded-xl px-4" />
+  // Success state
+  if (isSuccess) {
+    return (
+      <PageShell maxWidth="lg">
+        <Section
+          title="Campaign Created!"
+          description="Your crowdfunding campaign is now live on the blockchain"
+        >
+          <div className="rounded-[28px] border-2 border-emerald-500 bg-emerald-50 p-6 sm:p-8">
+            <div className="space-y-4 sm:space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold text-emerald-900 sm:text-xl">
+                  {createdCampaignAddress ? 'Project Created Successfully!' : 'Transaction Confirmed!'}
+                </h3>
+                <p className="mt-2 text-sm text-emerald-700">
+                  {createdCampaignAddress
+                    ? 'Your campaign has been created and is now live on-chain.'
+                    : 'Your transaction has been confirmed. The campaign should appear shortly.'}
+                </p>
               </div>
-              <div className="grid gap-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="deadline">
-                  Deadline
-                </label>
-                <Input id="deadline" name="deadline" type="date" className="h-11 rounded-xl px-4" />
-              </div>
-            </div>
-            <div className="grid gap-2">
-              <label className="text-sm font-medium text-slate-700" htmlFor="milestone">
-                Key Milestones
-              </label>
-              <textarea
-                id="milestone"
-                name="milestone"
-                rows={3}
-                placeholder="List the phased tasks or achievements needed to reach the goal..."
-                className={`${controlClass} resize-none`}
-              />
-            </div>
-          </CardContent>
-        </Card>
 
-        <Card className="w-full max-w-full rounded-[28px] border-0 bg-white shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5">
-          <CardHeader className="px-4 sm:px-8">
-            <CardTitle className="text-lg text-slate-900 sm:text-xl">Display & Category</CardTitle>
-            <CardDescription className="text-xs text-slate-500 sm:text-sm">
-              Upload cover image, select category, and provide media links for public display.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4 px-4 pb-6 sm:space-y-6 sm:px-8 sm:pb-8">
-            <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
-              <div className="grid gap-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="category">
-                  Project Category
-                </label>
-                <select
-                  id="category"
-                  name="category"
-                  className={controlClass}
-                  defaultValue="Technology"
-                >
-                  {categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="grid gap-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="cover">
-                  Cover Image URL
-                </label>
-                <Input
-                  id="cover"
-                  name="cover"
-                  placeholder="https://..."
-                  className="h-11 rounded-xl px-4"
-                />
-              </div>
-            </div>
-            <p className="text-xs text-slate-400">
-              Metadata will be generated and uploaded to IPFS automatically when you submit.
-            </p>
-          </CardContent>
-        </Card>
-
-        <div className="flex w-full max-w-full flex-col gap-3 rounded-[28px] border border-dashed border-slate-300 p-4 text-xs text-slate-500 sm:gap-4 sm:p-6 sm:text-sm">
-          <span className="text-sm font-medium text-slate-800 sm:text-base">Project Launch</span>
-          <p>
-            After submission, an on-chain transaction will be initiated to create a new Campaign
-            through the factory contract and include it in the index.
-          </p>
-          {formError && <p className="text-xs text-rose-500 sm:text-sm">{formError}</p>}
-          {writeError && !formError && (
-            <p className="text-xs text-rose-500 sm:text-sm">{writeError.message}</p>
-          )}
-          {isSuccess && createdCampaignAddress && (
-            <div className="rounded-2xl border-2 border-emerald-500 bg-emerald-50 p-4 sm:p-6">
-              <div className="space-y-3 sm:space-y-4">
-                <div>
-                  <h3 className="text-base font-semibold text-emerald-900 sm:text-lg">
-                    Project Created Successfully!
-                  </h3>
-                  <p className="mt-1 text-xs text-emerald-700 sm:text-sm">
-                    Your campaign has been created and is now live on-chain.
-                  </p>
+              {txHash && (
+                <div className="rounded-xl bg-white p-4 text-sm">
+                  <p className="font-medium text-slate-700">Transaction Details</p>
+                  <p className="mt-1 break-all text-xs text-slate-600">{txHash}</p>
+                  {receipt && (
+                    <p className="mt-2 text-xs text-slate-500">
+                      Block: {Number(receipt.blockNumber)} | Gas: {receipt.gasUsed?.toString()}
+                    </p>
+                  )}
                 </div>
-                {txHash && (
-                  <div className="rounded-xl bg-white p-2 text-xs text-slate-600 sm:p-3">
-                    <p className="font-medium text-slate-700">Transaction Hash</p>
-                    <p className="break-all">{txHash}</p>
-                    {receipt && (
-                      <p className="mt-1 text-slate-500">
-                        Block: {Number(receipt.blockNumber)} · Gas: {receipt.gasUsed?.toString()}
-                      </p>
-                    )}
-                  </div>
-                )}
-                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
+              )}
+
+              <div className="flex flex-col gap-3 sm:flex-row">
+                {createdCampaignAddress && (
                   <Button
                     asChild
-                    className="w-full rounded-full bg-emerald-600 px-6 hover:bg-emerald-700 sm:w-auto"
+                    className="rounded-full bg-emerald-600 px-8 hover:bg-emerald-700"
                   >
-                    <Link href={`/projects/${createdCampaignAddress}`}>View Project</Link>
+                    <Link href={`/projects/${createdCampaignAddress}`}>View Campaign</Link>
                   </Button>
-                  <Button asChild variant="outline" className="w-full rounded-full px-6 sm:w-auto">
-                    <Link href="/">Back to Home</Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
-          {isSuccess && !createdCampaignAddress && (
-            <div className="rounded-2xl border-2 border-emerald-500 bg-emerald-50 p-4 sm:p-6">
-              <div className="space-y-3 sm:space-y-4">
-                <div>
-                  <h3 className="text-base font-semibold text-emerald-900 sm:text-lg">
-                    Transaction Confirmed!
-                  </h3>
-                  <p className="mt-1 text-xs text-emerald-700 sm:text-sm">
-                    Your transaction has been confirmed. The campaign should appear shortly.
-                  </p>
-                </div>
-                {txHash && (
-                  <div className="rounded-xl bg-white p-2 text-xs text-slate-600 sm:p-3">
-                    <p className="font-medium text-slate-700">Transaction Hash</p>
-                    <p className="break-all">{txHash}</p>
-                    {receipt && (
-                      <p className="mt-1 text-slate-500">
-                        Block: {Number(receipt.blockNumber)} · Gas: {receipt.gasUsed?.toString()}
-                      </p>
-                    )}
-                  </div>
                 )}
-                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
-                  <Button asChild variant="outline" className="w-full rounded-full px-6 sm:w-auto">
-                    <Link href="/">Back to Home</Link>
-                  </Button>
-                </div>
+                <Button asChild variant="outline" className="rounded-full px-8">
+                  <Link href="/">Back to Home</Link>
+                </Button>
               </div>
             </div>
+          </div>
+        </Section>
+      </PageShell>
+    );
+  }
+
+  return (
+    <PageShell maxWidth="lg">
+      <Section
+        title="Create Campaign"
+        description="Launch your on-chain crowdfunding campaign in minutes"
+      >
+        {/* Step Indicator */}
+        <StepIndicator
+          steps={CREATE_STEPS}
+          currentStep={currentStep}
+          onStepClick={(index) => index < currentStep && setCurrentStep(index)}
+        />
+
+        {/* Form */}
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {/* Step 1: Basics */}
+          {currentStep === 0 && (
+            <FormSection
+              title="Project Basics"
+              description="Tell backers what your project is about"
+            >
+              <div className="grid gap-4">
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium text-slate-700" htmlFor="title">
+                    Project Title <span className="text-rose-500">*</span>
+                  </label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) => updateField('title', e.target.value)}
+                    placeholder="e.g., Next-generation Sustainable Energy Battery"
+                    className="h-11 rounded-xl px-4"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium text-slate-700" htmlFor="tagline">
+                    Tagline <span className="text-rose-500">*</span>
+                  </label>
+                  <Input
+                    id="tagline"
+                    value={formData.tagline}
+                    onChange={(e) => updateField('tagline', e.target.value)}
+                    placeholder="Tell everyone about your project highlights in one sentence"
+                    className="h-11 rounded-xl px-4"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium text-slate-700" htmlFor="description">
+                    Description <span className="text-rose-500">*</span>
+                  </label>
+                  <textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => updateField('description', e.target.value)}
+                    rows={5}
+                    placeholder="Expand on project background, vision, and core plans..."
+                    className={`${controlClass} resize-none`}
+                  />
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-2">
+                    <label className="text-sm font-medium text-slate-700" htmlFor="category">
+                      Category
+                    </label>
+                    <select
+                      id="category"
+                      value={formData.category}
+                      onChange={(e) => updateField('category', e.target.value)}
+                      className={controlClass}
+                    >
+                      {PROJECT_CATEGORIES.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="grid gap-2">
+                    <label className="text-sm font-medium text-slate-700" htmlFor="cover">
+                      Cover Image URL
+                    </label>
+                    <Input
+                      id="cover"
+                      value={formData.cover}
+                      onChange={(e) => updateField('cover', e.target.value)}
+                      placeholder="https://..."
+                      className="h-11 rounded-xl px-4"
+                    />
+                  </div>
+                </div>
+              </div>
+            </FormSection>
           )}
-          {!isSuccess && txHash && (
-            <div className="rounded-2xl bg-slate-100 p-3 text-xs text-slate-600 sm:p-4">
-              <p className="font-medium text-slate-700">Transaction Hash</p>
-              <p className="break-all">{txHash}</p>
-              {receipt && (
-                <p className="mt-2 text-slate-500">
-                  Block: {Number(receipt.blockNumber)} · Gas: {receipt.gasUsed?.toString()}
-                </p>
-              )}
+
+          {/* Step 2: Funding */}
+          {currentStep === 1 && (
+            <FormSection
+              title="Funding Goal"
+              description="Set your target amount and timeline"
+              onChainHint="Goal amount and deadline will be stored on-chain and cannot be modified after creation"
+            >
+              <div className="grid gap-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-2">
+                    <label className="text-sm font-medium text-slate-700" htmlFor="goal">
+                      Goal Amount (ETH) <span className="text-rose-500">*</span>
+                    </label>
+                    <Input
+                      id="goal"
+                      type="number"
+                      step="any"
+                      value={formData.goal}
+                      onChange={(e) => updateField('goal', e.target.value)}
+                      placeholder="10"
+                      className="h-11 rounded-xl px-4"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <label className="text-sm font-medium text-slate-700" htmlFor="deadline">
+                      Deadline <span className="text-rose-500">*</span>
+                    </label>
+                    <Input
+                      id="deadline"
+                      type="date"
+                      value={formData.deadline}
+                      onChange={(e) => updateField('deadline', e.target.value)}
+                      className="h-11 rounded-xl px-4"
+                    />
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium text-slate-700" htmlFor="milestone">
+                    Key Milestones (optional)
+                  </label>
+                  <textarea
+                    id="milestone"
+                    value={formData.milestone}
+                    onChange={(e) => updateField('milestone', e.target.value)}
+                    rows={3}
+                    placeholder="List the phased tasks or achievements needed to reach the goal..."
+                    className={`${controlClass} resize-none`}
+                  />
+                </div>
+              </div>
+            </FormSection>
+          )}
+
+          {/* Step 3: Review */}
+          {currentStep === 2 && (
+            <SummaryReview
+              title="Review Your Campaign"
+              items={[
+                { label: 'Project Title', value: formData.title },
+                { label: 'Category', value: formData.category },
+                { label: 'Funding Goal', value: `${formData.goal} ETH`, highlight: true },
+                { label: 'Deadline', value: formData.deadline },
+                ...(formData.cover ? [{ label: 'Cover Image', value: 'Provided' }] : []),
+              ]}
+              transactionNote="This will create a new Campaign smart contract. You will need to confirm the transaction in your wallet."
+            />
+          )}
+
+          {/* Error Messages */}
+          {formError && (
+            <div className="rounded-xl bg-rose-50 p-4 text-sm text-rose-600">
+              {formError}
             </div>
           )}
-          {!isSuccess && (
-            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
+          {writeError && !formError && (
+            <div className="rounded-xl bg-rose-50 p-4 text-sm text-rose-600">
+              {writeError.message}
+            </div>
+          )}
+
+          {/* Navigation */}
+          <div className="flex justify-between pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleBack}
+              disabled={currentStep === 0}
+              className="rounded-full px-6"
+            >
+              Back
+            </Button>
+
+            {currentStep < CREATE_STEPS.length - 1 ? (
+              <Button
+                type="button"
+                onClick={handleNext}
+                className="rounded-full px-6"
+              >
+                Continue
+              </Button>
+            ) : (
               <Button
                 type="submit"
                 disabled={submitDisabled}
-                className="w-full rounded-full px-6 sm:w-auto"
+                className="rounded-full px-6"
               >
                 {submitLabel}
               </Button>
-              <Button asChild variant="outline" className="w-full rounded-full px-6 sm:w-auto">
-                <Link href="/">Back to Home</Link>
-              </Button>
-            </div>
-          )}
-          {isUploadingMetadata && (
-            <p className="text-xs text-slate-400">Uploading metadata to IPFS...</p>
-          )}
-          {!isConnected && (
-            <p className="text-xs text-slate-400">
-              Please connect your wallet first to submit the transaction.
+            )}
+          </div>
+
+          {/* Connection hint */}
+          {!isConnected && currentStep === CREATE_STEPS.length - 1 && (
+            <p className="text-center text-xs text-slate-400">
+              Please connect your wallet to create a campaign
             </p>
           )}
-        </div>
-      </form>
-    </main>
+
+          {/* Uploading indicator */}
+          {isUploadingMetadata && (
+            <p className="text-center text-xs text-slate-400">
+              Uploading metadata to IPFS...
+            </p>
+          )}
+        </form>
+      </Section>
+    </PageShell>
   );
 }
