@@ -10,7 +10,9 @@
     "clean": "rm -rf dist",
     "build": "pnpm clean && tsc -p tsconfig.json",
     "migrate:gen": "NODE_TLS_REJECT_UNAUTHORIZED=0 drizzle-kit generate",
-    "migrate:push": "NODE_TLS_REJECT_UNAUTHORIZED=0 drizzle-kit push"
+    "migrate:push": "NODE_TLS_REJECT_UNAUTHORIZED=0 drizzle-kit push",
+    "migrate:push:local": "NODE_TLS_REJECT_UNAUTHORIZED=0 dotenv -e .env.local -- drizzle-kit push",
+    "migrate:gen:local": "NODE_TLS_REJECT_UNAUTHORIZED=0 dotenv -e .env.local -- drizzle-kit generate"
   },
   "keywords": [],
   "author": "",
