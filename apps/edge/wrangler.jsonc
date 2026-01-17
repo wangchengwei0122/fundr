@@ -1,27 +1,34 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	// 基本信息
+
+	// ============================================================================
+	// Fundr Edge Worker Configuration
+	// ============================================================================
+	// LOCAL:   Uses .dev.vars (API_URL=http://127.0.0.1:3001)
+	// DEPLOY:  Uses vars below (production API)
+	// ============================================================================
+
 	"name": "crowdfunding-edge",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-01-15",
 	"workers_dev": true,
-	// 定时任务（cron）
+
+	// Cron triggers for cache refresh
 	"triggers": {
-		"crons": [
-			"*/1 * * * *"
-		],
+		"crons": ["*/1 * * * *"]
 	},
-	// 绑定的 KV 命名空间
+
+	// KV namespace bindings
 	"kv_namespaces": [
 		{
 			"binding": "KV",
-			// 运行 `wrangler kv:namespace create KV` 后将 id 写到这里；
-			// 本地预览可使用 preview_id（`wrangler kv:namespace create --preview KV`）
-			"id": "fd693cb1fdfe410aacb6843ba16f05d1",
-		},
+			"id": "fd693cb1fdfe410aacb6843ba16f05d1"
+		}
 	],
-	// 环境变量
+
+	// Production environment variables (used on deploy)
+	// NOTE: Local development uses .dev.vars instead
 	"vars": {
-		"API_URL": "https://fundr-4gnq.onrender.com",
-	},
+		"API_URL": "https://fundr-4gnq.onrender.com"
+	}
 }

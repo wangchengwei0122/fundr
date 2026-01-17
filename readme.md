@@ -25,13 +25,15 @@ Core principles:
 
 ## Modules
 
-- **apps/indexer** - WebSocket indexing service that listens to on-chain events and writes to PostgreSQL. Includes batching, retry/backoff, checkpoints, and periodic refresh mechanisms
-- **packages/db** - Shared Drizzle database schema (campaigns + checkpoints) ensuring data consistency between indexer and API
-- **apps/api** - Fastify REST API that wraps Drizzle queries, provides filtering/pagination, and serves as the single data source for frontend and edge
-- **apps/edge** - Cloudflare Worker that proxies API requests, implements KV read-through caching, keeping logic minimal (no blockchain access)
-- **apps/web** - Next.js 15 frontend using React Query + wagmi + viem for wallet interactions, all data reads go through Edge Worker
-- **packages/contracts** - Foundry smart contracts with ABI outputs synchronized across the workspace
-- **scripts/** - Helper scripts for ABI/address sync, database migrations, deployments, and environment configuration
+- **apps/indexer** - WebSocket indexing service that listens to on-chain events and writes to PostgreSQL
+- **packages/db** - Shared Drizzle database schema (campaigns + checkpoints)
+- **apps/api** - Fastify REST API that wraps Drizzle queries
+- **apps/edge** - Cloudflare Worker that proxies API requests with KV caching
+- **apps/web** - Next.js 15 frontend using React Query + wagmi + viem
+- **packages/contracts** - Foundry smart contracts
+- **scripts/** - Deployment and environment configuration scripts
+
+---
 
 ## Getting Started
 
@@ -41,6 +43,7 @@ Core principles:
 - **pnpm** 9+
 - **Foundry** (forge, anvil, cast) - [Installation Guide](https://book.getfoundry.sh/getting-started/installation)
 - **jq** - `brew install jq` (macOS) or `apt install jq` (Linux)
+- **PostgreSQL** (optional, for full stack mode)
 
 ### Install Dependencies
 
@@ -54,7 +57,7 @@ pnpm install
 
 ### Quick Start (Recommended)
 
-One command to start the complete local development environment:
+**One command to start the complete local development environment:**
 
 ```bash
 pnpm dev:local
@@ -64,7 +67,7 @@ This command will:
 
 1. Start **Anvil** local blockchain (chainId: 31337, port: 8545)
 2. Deploy smart contracts automatically
-3. Update `apps/web/.env.local` with contract addresses
+3. Update all `.env.local` files with contract addresses
 4. Start **Edge Worker** (port: 8787)
 5. Start **Next.js** frontend (port: 3000)
 
@@ -78,15 +81,20 @@ pnpm dev:local:full
 
 This additionally starts:
 
-- **Event Indexer** - Listens to chain events
-- **Fastify API** - Data service (port: 3001)
+- **Event Indexer** - Listens to chain events (uses `.env.local`)
+- **Fastify API** - Data service on port 3001 (uses `.env.local`)
 
 ### Important Notes
 
-> **Warning:** Anvil starts with a fresh, empty blockchain every time.
+> ⚠️ **Anvil starts with a fresh, empty blockchain every time.**
 > Each restart of Anvil requires re-deploying contracts.
 
-> **Data Sources:**
+> 🔒 **Local environment is completely isolated:**
+> - Local Indexer/API will **NOT** connect to Sepolia or production databases
+> - All services use `.env.local` files which are auto-generated
+> - The deploy script validates Chain ID = 31337 before deployment
+
+> 📦 **Data Sources:**
 > - **Basic mode** (`dev:local`): Frontend uses chain fallback to read data directly
 > - **Full mode** (`dev:local:full`): Frontend reads from Indexer → API → Edge
 
@@ -102,56 +110,105 @@ pnpm chain:local:start
 pnpm contracts:deploy:local
 
 # Terminal 3: Start Edge Worker
-pnpm edge:local:start
+pnpm edge:dev:local
 
 # Terminal 4: Start Frontend
-pnpm web:local:start
+pnpm web:dev:local
 
-# Optional (requires DATABASE_URL):
-# Terminal 5: Start API
-pnpm api:local:start
+# Optional (requires local PostgreSQL):
+# Terminal 5: Start API (explicitly loads .env.local)
+pnpm api:dev:local
 
-# Terminal 6: Start Indexer
-pnpm indexer:local:start
+# Terminal 6: Start Indexer (explicitly loads .env.local)
+pnpm indexer:dev:local
 ```
 
 ---
 
-## Environment Variables
+## Environment Configuration
+
+### Environment File Structure
+
+Each sub-project uses environment-specific files:
+
+```
+apps/
+├── web/
+│   ├── .env.local          # Local development (auto-generated)
+│   └── .env.example        # Template
+├── api/
+│   ├── .env.local          # Local development
+│   ├── .env.sepolia        # Sepolia testnet
+│   └── .env.example        # Template
+├── indexer/
+│   ├── .env.local          # Local development (auto-generated)
+│   ├── .env.sepolia        # Sepolia testnet
+│   └── .env.example        # Template
+└── edge/
+    ├── .dev.vars           # Local development (auto-generated)
+    ├── .dev.vars.example   # Template
+    └── wrangler.jsonc      # Production config
+```
+
+### Security Rules
+
+- ✅ Only `.env.example` and `.dev.vars.example` are committed to Git
+- ❌ All real env files (`.env.local`, `.env.sepolia`, `.dev.vars`) are gitignored
+- ❌ Local scripts cannot connect to Sepolia or production databases
+- ❌ Deploy scripts validate Chain ID before execution
 
 ### apps/web/.env.local
 
 ```env
-# Edge Worker endpoint
+# Auto-generated by deploy-contracts-local.sh
+
+# Edge Worker (local)
 NEXT_PUBLIC_EDGE=http://127.0.0.1:8787
 
-# Blockchain configuration (auto-generated by deploy script)
+# Blockchain (Anvil local chain)
 NEXT_PUBLIC_RPC_URL=http://127.0.0.1:8545
 NEXT_PUBLIC_CHAIN_ID=31337
 NEXT_PUBLIC_FACTORY=0x...
 NEXT_PUBLIC_DEPLOY_BLOCK=0
 
-# Pinata IPFS (required for file uploads)
+# Pinata IPFS (preserved across deployments)
 PINATA_JWT=your_pinata_jwt
 NEXT_PUBLIC_GATEWAY_URL=your_gateway.mypinata.cloud
 ```
 
-### apps/indexer/.env (for production/testnet)
+### apps/indexer/.env.local
 
 ```env
-RPC_HTTP=https://your-rpc-endpoint
-RPC_WSS=wss://your-websocket-endpoint
-CHAIN_ID=11155111
+# Auto-generated by deploy-contracts-local.sh
+
+# Blockchain RPC (Anvil)
+RPC_HTTP=http://127.0.0.1:8545
+RPC_WSS=ws://127.0.0.1:8545
+
+# Chain Configuration
+CHAIN_ID=31337
 FACTORY=0x...
-DEPLOY_BLOCK=9729410
-DATABASE_URL=postgresql://...
+DEPLOY_BLOCK=0
+
+# Local Database
+DATABASE_URL=postgresql://localhost:5432/fundr_local
 ```
 
-### apps/api/.env
+### apps/api/.env.local
 
 ```env
-DATABASE_URL=postgresql://...
+# Local Database
+DATABASE_URL=postgresql://localhost:5432/fundr_local
 PORT=3001
+NODE_ENV=development
+CORS_ORIGIN=*
+```
+
+### apps/edge/.dev.vars
+
+```env
+# Auto-generated by dev-local.sh
+API_URL=http://127.0.0.1:3001
 ```
 
 ---
@@ -162,72 +219,54 @@ PORT=3001
 
 | Script | Description |
 |--------|-------------|
-| `pnpm dev:local` | Start local dev environment (chain + deploy + edge + web) |
+| `pnpm dev:local` | 🚀 **Recommended** - Start complete local dev environment |
 | `pnpm dev:local:full` | Start full stack (includes indexer + api) |
 | `pnpm dev:local:ui` | Start only edge + web (assumes chain is running) |
 
-### Individual Services
+### Individual Services (Local)
 
 | Script | Description |
 |--------|-------------|
 | `pnpm chain:local:start` | Start Anvil local blockchain |
 | `pnpm contracts:deploy:local` | Deploy contracts to local Anvil |
-| `pnpm web:local:start` | Start Next.js frontend |
-| `pnpm edge:local:start` | Start Cloudflare Edge Worker |
-| `pnpm api:local:start` | Start Fastify API server |
-| `pnpm indexer:local:start` | Start event indexer |
+| `pnpm web:dev:local` | Start Next.js frontend |
+| `pnpm edge:dev:local` | Start Cloudflare Edge Worker |
+| `pnpm api:dev:local` | Start Fastify API (loads `.env.local`) |
+| `pnpm indexer:dev:local` | Start event indexer (loads `.env.local`) |
 
-### Build & Deploy
+### Sepolia Testnet
+
+| Script | Description |
+|--------|-------------|
+| `pnpm contracts:deploy:sepolia` | Deploy contracts to Sepolia |
+| `pnpm indexer:dev:sepolia` | Start indexer for Sepolia (loads `.env.sepolia`) |
+| `pnpm api:dev:sepolia` | Start API for Sepolia (loads `.env.sepolia`) |
+| `pnpm dev:sepolia` | Start indexer + api for Sepolia |
+
+### Deployment
 
 | Script | Description |
 |--------|-------------|
 | `pnpm contracts:build` | Build smart contracts |
-| `pnpm contracts:deploy:sepolia` | Deploy to Sepolia testnet |
 | `pnpm edge:deploy:cloudflare` | Deploy Edge Worker to Cloudflare |
 | `pnpm indexer:deploy:flyio` | Deploy Indexer to Fly.io |
 
+---
+
 ## Core Features
 
-- **Real-time synced campaigns** - Indexer listens for `CampaignCreated` events, extracts goal/deadline, and writes data to `campaigns` and `checkpoints` tables
-- **Edge caching layer** - Cloudflare Worker provides KV read-through caching for faster UI loads
-- **Modern frontend** - Next.js 15 App Router with server components, Tailwind CSS, React Query, wagmi, and viem
-- **Smart contracts & tooling** - Foundry contracts and scripts ensure ABI/address deployment synchronization
+- **Real-time synced campaigns** - Indexer listens for `CampaignCreated` events
+- **Edge caching layer** - Cloudflare Worker provides KV read-through caching
+- **Modern frontend** - Next.js 15 App Router with Tailwind CSS, React Query, wagmi
+- **Smart contracts** - Foundry contracts with automated ABI sync
 
-## Development Guide
-
-### Smart Contracts
-
-```bash
-# Run tests
-pnpm --filter @packages/contracts test
-# or
-forge test
-
-# Build contracts
-pnpm contracts:build
-
-# Deploy locally
-pnpm contracts:deploy:local:auto
-
-# Deploy to Sepolia
-pnpm contracts:deploy:sepolia
-```
-
-### Database Migrations
-
-```bash
-# Generate migration files
-pnpm db:generate
-
-# Push migrations to database
-pnpm db:push
-```
+---
 
 ## Tech Stack
 
-- **Frontend**: Next.js 15, React, TypeScript, Tailwind CSS, wagmi, viem
+- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS v4, wagmi, viem
 - **Backend**: Fastify, Drizzle ORM, PostgreSQL
 - **Indexer**: Node.js, viem (WebSocket), Drizzle ORM
 - **Edge**: Cloudflare Workers, KV
 - **Smart Contracts**: Foundry, Solidity 0.8.30
-- **Tooling**: pnpm workspaces, TypeScript
+- **Tooling**: pnpm workspaces, TypeScript, dotenv-cli

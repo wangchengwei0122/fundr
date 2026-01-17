@@ -1,7 +1,7 @@
 {
   "name": "web3-Kickstarter",
   "version": "1.0.0",
-  "description": "",
+  "description": "Decentralized crowdfunding platform",
   "main": "index.js",
   "scripts": {
     "chain:local:start": "anvil -p 8545 --chain-id 31337",
@@ -9,23 +9,27 @@
 
     "contracts:build": "pnpm --filter @packages/contracts exec forge build",
     "contracts:deploy:local": "bash scripts/deploy-contracts-local.sh",
-    "contracts:deploy:sepolia": "bash scripts/deploy_sepolia.sh",
+    "contracts:deploy:sepolia": "bash scripts/deploy-sepolia.sh",
 
-    "indexer:local:start": "pnpm --filter @apps/indexer dev",
+    "indexer:dev:local": "dotenv -e apps/indexer/.env.local -- pnpm --filter @apps/indexer dev",
+    "indexer:dev:sepolia": "dotenv -e apps/indexer/.env.sepolia -- pnpm --filter @apps/indexer dev",
     "indexer:deploy:flyio": "bash scripts/deploy-indexer.sh",
 
-    "api:local:start": "pnpm --filter @apps/api dev",
+    "api:dev:local": "dotenv -e apps/api/.env.local -- pnpm --filter @apps/api dev",
+    "api:dev:sepolia": "dotenv -e apps/api/.env.sepolia -- pnpm --filter @apps/api dev",
 
-    "edge:local:start": "pnpm --filter @apps/edge dev",
+    "edge:dev:local": "pnpm --filter @apps/edge dev",
     "edge:deploy:cloudflare": "pnpm --filter @apps/edge run deploy",
     "edge:kv:create": "pnpm --filter @apps/edge kv:create",
     "edge:kv:create:preview": "pnpm --filter @apps/edge kv:create:preview",
 
-    "web:local:start": "pnpm --filter @apps/web dev",
+    "web:dev:local": "pnpm --filter @apps/web dev",
 
     "dev:local": "bash scripts/dev-local.sh",
-    "dev:local:ui": "concurrently -k -n edge,web -c blue,green \"pnpm edge:local:start\" \"pnpm web:local:start\"",
+    "dev:local:ui": "concurrently -k -n edge,web -c blue,green \"pnpm edge:dev:local\" \"pnpm web:dev:local\"",
     "dev:local:full": "bash scripts/dev-local.sh --full",
+
+    "dev:sepolia": "concurrently -k -n indexer,api -c magenta,yellow \"pnpm indexer:dev:sepolia\" \"pnpm api:dev:sepolia\"",
 
     "prepare": "husky install",
     "commit": "git-cz"
@@ -37,6 +41,7 @@
     "concurrently": "^9.2.1",
     "cross-env": "^7.0.3",
     "cz-conventional-changelog": "^3.3.0",
+    "dotenv-cli": "^8.0.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.6",
     "prettier": "^3.6.2",

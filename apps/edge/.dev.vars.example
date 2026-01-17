@@ -1,0 +1,14 @@
+# ============================================================================
+# Fundr Edge Worker - Development Variables Template
+# ============================================================================
+# Copy this file to .dev.vars for local development
+# Used by: wrangler dev --local
+#
+# NEVER commit .dev.vars with real values to version control!
+# ============================================================================
+
+# API endpoint
+# LOCAL:   http://127.0.0.1:3001
+# SEPOLIA: https://your-test-api.onrender.com
+# PROD:    https://your-prod-api.com
+API_URL=http://127.0.0.1:3001
