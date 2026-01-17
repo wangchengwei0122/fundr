@@ -4,17 +4,29 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev:anvil": "anvil -p 8545",
-    "dev:edge": "pnpm --filter @apps/edge dev",
-    "dev:web": "pnpm --filter @apps/web dev",
-    "dev": "concurrently -k -n anvil,edge,web \"pnpm dev:anvil\" \"pnpm dev:edge\" \"pnpm dev:web\"",
+    "chain:local:start": "anvil -p 8545 --chain-id 31337",
+    "chain:local:start:ws": "anvil -p 8545 --chain-id 31337 --ws",
+
     "contracts:build": "pnpm --filter @packages/contracts exec forge build",
-    "contracts:deploy:local:auto": "bash scripts/deploy_all.sh",
+    "contracts:deploy:local": "bash scripts/deploy-contracts-local.sh",
     "contracts:deploy:sepolia": "bash scripts/deploy_sepolia.sh",
-    "deploy:edge": "pnpm --filter @apps/edge run deploy",
+
+    "indexer:local:start": "pnpm --filter @apps/indexer dev",
+    "indexer:deploy:flyio": "bash scripts/deploy-indexer.sh",
+
+    "api:local:start": "pnpm --filter @apps/api dev",
+
+    "edge:local:start": "pnpm --filter @apps/edge dev",
+    "edge:deploy:cloudflare": "pnpm --filter @apps/edge run deploy",
     "edge:kv:create": "pnpm --filter @apps/edge kv:create",
     "edge:kv:create:preview": "pnpm --filter @apps/edge kv:create:preview",
-    "indexer:deploy": "bash ./scripts/deploy-indexer.sh",
+
+    "web:local:start": "pnpm --filter @apps/web dev",
+
+    "dev:local": "bash scripts/dev-local.sh",
+    "dev:local:ui": "concurrently -k -n edge,web -c blue,green \"pnpm edge:local:start\" \"pnpm web:local:start\"",
+    "dev:local:full": "bash scripts/dev-local.sh --full",
+
     "prepare": "husky install",
     "commit": "git-cz"
   },
