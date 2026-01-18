@@ -38,22 +38,22 @@ export default function ProjectsPage() {
       <section className="w-full max-w-full space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="w-full max-w-full">
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
               All Projects
             </h1>
-            <p className="mt-1 text-sm text-slate-500 sm:text-base">
+            <p className="mt-1 text-sm text-muted-foreground sm:text-base">
               Browse all available crowdfunding projects and discover initiatives that resonate with
               you.
             </p>
           </div>
-          <div className="flex w-full max-w-full overflow-x-auto rounded-full bg-slate-100 p-1 sm:w-auto">
+          <div className="flex w-full max-w-full overflow-x-auto rounded-full bg-muted p-1 sm:w-auto">
             {sortTabs.map((tab) => (
               <button
                 key={tab.key}
                 type="button"
                 onClick={() => setSortKey(tab.key)}
-                className={`shrink-0 rounded-full px-4 py-1 text-sm font-medium transition sm:px-5 sm:text-base ${
-                  sortKey === tab.key ? 'bg-white shadow-sm' : 'text-slate-500'
+                className={`shrink-0 rounded-full px-4 py-1 text-sm font-medium transition-base sm:px-5 sm:text-base ${
+                  sortKey === tab.key ? 'bg-card shadow-soft' : 'text-muted-foreground'
                 }`}
                 disabled={sortKey === tab.key}
               >
@@ -64,7 +64,7 @@ export default function ProjectsPage() {
         </div>
 
         {isError && (
-          <div className="rounded-2xl border border-rose-200 bg-rose-50/80 p-4 text-sm text-rose-700">
+          <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
             Worker is temporarily unavailable, trying to fallback directly to chain. Please refresh
             later.
           </div>
@@ -73,7 +73,7 @@ export default function ProjectsPage() {
         {isLoading && projects.length === 0 ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
             {Array.from({ length: 6 }).map((_, index) => (
-              <div key={index} className="h-64 animate-pulse rounded-[28px] bg-slate-200/60" />
+              <div key={index} className="h-64 animate-pulse rounded-xl bg-muted/60" />
             ))}
           </div>
         ) : (
@@ -82,7 +82,7 @@ export default function ProjectsPage() {
 
         {projects.length > 0 && (
           <div className="flex w-full max-w-full flex-col gap-3">
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-muted-foreground">
               Data source: {source === 'edge' ? 'Edge Cache' : 'Chain Fallback'}
             </p>
             <div className="flex w-full max-w-full items-center justify-center">

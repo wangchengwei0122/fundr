@@ -12,14 +12,14 @@ export type ProjectListProps = {
 export function ProjectList({ projects }: ProjectListProps) {
   if (projects.length === 0) {
     return (
-      <AppCard className="border-dashed bg-white/60">
+      <AppCard className="border-dashed bg-card/60">
         <AppCardHeader>
           <AppCardTitle className="text-center text-lg">No projects found</AppCardTitle>
           <AppCardDescription className="text-center">
             Be the first to launch a project and start your Web3 crowdfunding journey.
           </AppCardDescription>
         </AppCardHeader>
-        <AppCardContent className="pb-6 text-center text-sm text-slate-500">
+        <AppCardContent className="pb-6 text-center text-sm text-muted-foreground">
           Future projects will be displayed here.
         </AppCardContent>
       </AppCard>
@@ -32,7 +32,7 @@ export function ProjectList({ projects }: ProjectListProps) {
         <Link
           key={project.id}
           href={`/projects/${project.id}`}
-          className="block rounded-[32px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2"
+          className="block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <ProjectCard project={project} />
         </Link>

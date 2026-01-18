@@ -31,10 +31,10 @@ export default function AccountPage() {
     return (
       <PageShell>
         <div className="flex min-h-[50vh] items-center justify-center">
-          <div className="rounded-[32px] bg-white p-8 text-center shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5 sm:p-12">
-            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
+          <div className="rounded-2xl bg-card p-8 text-center shadow-card ring-1 ring-border sm:p-12">
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
               <svg
-                className="h-8 w-8 text-slate-400"
+                className="h-8 w-8 text-muted-foreground"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -53,8 +53,8 @@ export default function AccountPage() {
                 />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-slate-900">Connect Your Wallet</h2>
-            <p className="mt-2 text-sm text-slate-500">
+            <h2 className="text-xl font-semibold text-foreground">Connect Your Wallet</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
               Connect your wallet to view your on-chain identity and activity
             </p>
           </div>
@@ -185,15 +185,15 @@ function CampaignCard({ campaign }: { campaign: CampaignInfo }) {
   return (
     <Link
       href={`/projects/${campaign.address}`}
-      className="group flex gap-4 rounded-[24px] bg-white p-4 shadow-lg shadow-slate-900/5 ring-1 ring-slate-900/5 transition hover:-translate-y-1 hover:shadow-xl sm:p-5"
+      className="group flex gap-4 rounded-xl bg-card p-4 shadow-card ring-1 ring-border transition-base hover:-translate-y-0.5 hover:shadow-float sm:p-5"
     >
-      <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:h-20 sm:w-20">
+      <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-muted sm:h-20 sm:w-20">
         <Image
           src={campaign.imageUrl}
           alt={campaign.title}
           width={80}
           height={80}
-          className="h-full w-full object-cover transition-transform group-hover:scale-105"
+          className="h-full w-full object-cover transition-base group-hover:scale-105"
         />
       </div>
       <div className="min-w-0 flex-1 space-y-2">
@@ -207,15 +207,15 @@ function CampaignCard({ campaign }: { campaign: CampaignInfo }) {
             {PROJECT_STATUS_LABELS[derivedStatus]}
           </span>
         </div>
-        <h3 className="line-clamp-1 text-base font-semibold text-slate-900 group-hover:text-primary sm:text-lg">
+        <h3 className="line-clamp-1 text-base font-semibold text-foreground group-hover:text-primary sm:text-lg">
           {campaign.title}
         </h3>
-        <div className="flex items-center gap-4 text-xs text-slate-500">
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span>{Math.round(campaign.progress * 100)}% funded</span>
           <span>{formatEth(campaign.pledgedAmount)}</span>
         </div>
         {/* Progress bar */}
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
           <div
             className="h-full rounded-full bg-primary/80"
             style={{ width: `${Math.min(100, Math.round(campaign.progress * 100))}%` }}
@@ -233,7 +233,7 @@ function LoadingGrid() {
       {[1, 2].map((i) => (
         <div
           key={i}
-          className="h-32 animate-pulse rounded-[24px] bg-slate-200/60"
+          className="h-32 animate-pulse rounded-xl bg-muted/60"
         />
       ))}
     </div>
@@ -249,8 +249,8 @@ function EmptyState({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-[24px] border-2 border-dashed border-slate-200 bg-slate-50/50 p-8 text-center">
-      <p className="text-sm text-slate-500">{message}</p>
+    <div className="rounded-xl border-2 border-dashed border-border bg-muted/30 p-8 text-center">
+      <p className="text-sm text-muted-foreground">{message}</p>
       {action}
     </div>
   );

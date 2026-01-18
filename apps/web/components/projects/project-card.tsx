@@ -17,10 +17,10 @@ const statusLabel: Record<ProjectSummary['status'], string> = {
 };
 
 const statusClassName: Record<ProjectSummary['status'], string> = {
-  active: 'bg-blue-100 text-blue-600',
-  successful: 'bg-emerald-100 text-emerald-600',
-  failed: 'bg-rose-100 text-rose-600',
-  cancelled: 'bg-slate-100 text-slate-500',
+  active: 'bg-status-active text-status-active-foreground',
+  successful: 'bg-status-successful text-status-successful-foreground',
+  failed: 'bg-status-failed text-status-failed-foreground',
+  cancelled: 'bg-muted text-muted-foreground',
 };
 
 function formatEth(value: number) {
@@ -51,20 +51,20 @@ export function ProjectCard({ project }: ProjectCardProps) {
   })();
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-[28px] bg-white shadow-lg shadow-blue-950/5 ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+    <article className="group flex h-full flex-col overflow-hidden rounded-xl bg-card shadow-card ring-1 ring-border transition-base hover:-translate-y-0.5 hover:shadow-float">
       <div className="relative aspect-[16/11] w-full overflow-hidden">
         <Image
           src={project.imageUrl}
           alt={project.title}
           width={800}
           height={550}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="h-full w-full object-cover transition-slower group-hover:scale-105"
         />
-        <span className="absolute left-5 top-5 inline-flex items-center rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-slate-700 shadow-sm">
+        <span className="glass absolute left-5 top-5 inline-flex items-center rounded-full px-3 py-1 text-xs font-medium text-foreground">
           {project.category}
         </span>
         <span
-          className={`absolute right-5 top-5 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold shadow-sm ${statusClassName[project.status]}`}
+          className={`absolute right-5 top-5 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${statusClassName[project.status]}`}
         >
           {statusLabel[project.status]}
         </span>
@@ -72,35 +72,35 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
       <div className="flex flex-1 flex-col gap-6 p-6">
         <div className="space-y-3">
-          <p className="break-words text-sm text-slate-500">
-            By <span className="font-medium text-slate-900 break-words">{project.creator}</span>
+          <p className="break-words text-sm text-muted-foreground">
+            By <span className="font-medium text-foreground break-words">{project.creator}</span>
           </p>
-          <h3 className="text-xl font-semibold text-slate-900">{project.title}</h3>
-          <p className="line-clamp-2 min-h-[2.5rem] text-sm leading-relaxed text-slate-600">
+          <h3 className="text-xl font-semibold text-foreground">{project.title}</h3>
+          <p className="line-clamp-2 min-h-[2.5rem] text-sm leading-relaxed text-muted-foreground">
             {project.summary}
           </p>
         </div>
 
         <div className="space-y-3">
-          <div className="flex items-center justify-between text-sm font-medium text-slate-600">
+          <div className="flex items-center justify-between text-sm font-medium text-muted-foreground">
             <span>{formatEth(project.pledgedAmount)}</span>
-            <span className="text-slate-400">Target {formatEth(project.goalAmount)}</span>
+            <span className="text-muted-foreground/70">Target {formatEth(project.goalAmount)}</span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-sky-500 to-blue-500 transition-all duration-500"
+              className="h-full rounded-full bg-gradient-to-r from-primary to-primary/70 transition-slower"
               style={{ width: `${Math.round(progress * 100)}%` }}
             />
           </div>
-          <div className="flex items-center justify-between text-xs text-slate-500">
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>Progress {Math.round(progress * 100)}%</span>
             <span>{daysLeft ?? '--'} days left</span>
           </div>
         </div>
 
-        <div className="flex items-center justify-between text-sm font-medium text-blue-600">
+        <div className="flex items-center justify-between text-sm font-medium text-primary">
           <span>view project</span>
-          <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">
+          <span aria-hidden className="transition-base group-hover:translate-x-1">
             →
           </span>
         </div>

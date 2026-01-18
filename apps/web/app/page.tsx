@@ -128,13 +128,13 @@ export default function HomePage() {
         description="Discover projects from verified creators"
         action={
           <div className="flex items-center gap-3">
-            <div className="flex overflow-hidden rounded-full bg-slate-100 p-1">
+            <div className="flex overflow-hidden rounded-full bg-muted p-1">
               {sortTabs.map((tab) => (
                 <button
                   key={tab.key}
                   type="button"
                   onClick={() => setSortKey(tab.key)}
-                  className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium transition sm:px-4 sm:text-sm ${sortKey === tab.key ? 'bg-white shadow-sm' : 'text-slate-500'}`}
+                  className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-base sm:px-4 sm:text-sm ${sortKey === tab.key ? 'bg-card shadow-soft' : 'text-muted-foreground'}`}
                   disabled={sortKey === tab.key}
                 >
                   {tab.label}
@@ -148,7 +148,7 @@ export default function HomePage() {
         }
       >
         {isError && (
-          <div className="rounded-2xl border border-rose-200 bg-rose-50/80 p-4 text-sm text-rose-700">
+          <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
             Worker is temporarily unavailable, trying to fallback directly to chain. Please refresh later.
           </div>
         )}
@@ -156,7 +156,7 @@ export default function HomePage() {
         {isLoading && projects.length === 0 ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
             {Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className="h-64 animate-pulse rounded-[28px] bg-slate-200/60" />
+              <div key={index} className="h-64 animate-pulse rounded-xl bg-muted/60" />
             ))}
           </div>
         ) : (
@@ -173,7 +173,7 @@ export default function HomePage() {
             >
               {hasMore ? (isLoading ? 'Loading...' : 'Load More') : 'No more projects'}
             </AppButton>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-muted-foreground">
               Data source: {source === 'edge' ? 'Edge Cache' : 'Chain Fallback'}
             </p>
           </div>
@@ -193,7 +193,7 @@ function FeaturedCampaign({ project }: { project: ProjectSummary }) {
   return (
     <Link
       href={`/projects/${project.id}`}
-      className="group block overflow-hidden rounded-[32px] bg-white shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5 transition hover:shadow-2xl hover:shadow-slate-900/10"
+      className="group block overflow-hidden rounded-2xl bg-card shadow-card ring-1 ring-border transition-base hover:shadow-float hover:glow-primary"
     >
       <div className="grid gap-0 lg:grid-cols-2">
         {/* Image */}
@@ -202,10 +202,10 @@ function FeaturedCampaign({ project }: { project: ProjectSummary }) {
             src={project.imageUrl}
             alt={project.title}
             fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-cover transition-slower group-hover:scale-105"
           />
           <div className="absolute left-4 top-4 flex gap-2">
-            <AppBadge className="rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-slate-700 backdrop-blur-sm">
+            <AppBadge className="glass rounded-full px-3 py-1 text-xs font-medium text-foreground">
               {project.category}
             </AppBadge>
             <AppBadge
@@ -219,25 +219,25 @@ function FeaturedCampaign({ project }: { project: ProjectSummary }) {
         {/* Content */}
         <div className="flex flex-col justify-between p-6 sm:p-8 lg:p-10">
           <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Featured
             </p>
-            <h3 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            <h3 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
               {project.title}
             </h3>
-            <p className="mt-3 line-clamp-3 text-sm text-slate-600 sm:text-base">
+            <p className="mt-3 line-clamp-3 text-sm text-muted-foreground sm:text-base">
               {project.summary}
             </p>
-            <p className="mt-4 text-sm text-slate-500">
-              by <span className="font-medium text-slate-700">{project.creator}</span>
+            <p className="mt-4 text-sm text-muted-foreground">
+              by <span className="font-medium text-foreground">{project.creator}</span>
             </p>
           </div>
 
           <div className="mt-6 space-y-4">
             {/* Progress bar */}
-            <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-sky-500 to-blue-500 transition-all duration-500"
+                className="h-full rounded-full bg-gradient-to-r from-primary to-primary/70 transition-slower"
                 style={{ width: `${Math.min(100, Math.round(progress * 100))}%` }}
               />
             </div>
@@ -245,20 +245,20 @@ function FeaturedCampaign({ project }: { project: ProjectSummary }) {
             {/* Stats */}
             <div className="flex items-end justify-between">
               <div>
-                <p className="text-2xl font-bold text-slate-900 sm:text-3xl">
+                <p className="text-2xl font-bold text-foreground sm:text-3xl">
                   {formatEth(project.pledgedAmount)}
                 </p>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-muted-foreground">
                   of {formatEth(project.goalAmount)} goal
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-bold text-slate-900 sm:text-3xl">{daysLeft}</p>
-                <p className="text-sm text-slate-500">days left</p>
+                <p className="text-2xl font-bold text-foreground sm:text-3xl">{daysLeft}</p>
+                <p className="text-sm text-muted-foreground">days left</p>
               </div>
             </div>
 
-            <AppButton className="w-full rounded-full" size="lg">
+            <AppButton className="w-full rounded-full" size="lg" glow="primary">
               View Campaign
             </AppButton>
           </div>
@@ -279,12 +279,12 @@ function StepCard({
   description: string;
 }) {
   return (
-    <div className="rounded-[24px] bg-white p-6 shadow-lg shadow-slate-900/5 ring-1 ring-slate-900/5">
-      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-xl font-bold text-white">
+    <div className="rounded-xl bg-card p-6 shadow-card ring-1 ring-border transition-base hover:shadow-float">
+      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-xl font-bold text-primary-foreground">
         {step}
       </div>
-      <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
-      <p className="mt-2 text-sm text-slate-600">{description}</p>
+      <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+      <p className="mt-2 text-sm text-muted-foreground">{description}</p>
     </div>
   );
 }

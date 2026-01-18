@@ -113,21 +113,21 @@ export function ProjectMyPledge({
   }
 
   return (
-    <AppCard className="w-full rounded-[28px] border-0 bg-white p-4 shadow-lg shadow-blue-950/5 ring-1 ring-slate-900/5 sm:p-6">
+    <AppCard className="w-full rounded-xl border-0 bg-card p-4 shadow-card ring-1 ring-border sm:p-6">
       <AppCardHeader className="px-0">
-        <AppCardTitle className="text-base font-semibold text-slate-900 sm:text-lg">
+        <AppCardTitle className="text-base font-semibold text-foreground sm:text-lg">
           My Pledge
         </AppCardTitle>
       </AppCardHeader>
-      <AppCardContent className="px-0 text-xs text-slate-500 sm:text-sm">
+      <AppCardContent className="px-0 text-xs text-muted-foreground sm:text-sm">
         <div className="space-y-2 sm:space-y-3">
-          <p className="text-slate-600">
+          <p className="text-muted-foreground">
             {isReadingPledge
               ? 'Loading...'
               : `You have pledged: ${formatEth(userPledgeEthNum)}`}
           </p>
           {formError && (
-            <p className="text-xs text-rose-500">{formError}</p>
+            <p className="text-xs text-destructive">{formError}</p>
           )}
           <div className="grid w-full grid-cols-2 gap-2 sm:gap-3">
             <AppButton

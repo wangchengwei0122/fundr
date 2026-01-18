@@ -26,14 +26,14 @@ export function FormSection({
   return (
     <AppCard
       className={cn(
-        'rounded-[28px] border-0 bg-white shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5',
+        'rounded-xl border-0 bg-card shadow-card ring-1 ring-border',
         className
       )}
     >
       <AppCardHeader className="px-6 sm:px-8">
-        <AppCardTitle className="text-lg text-slate-900 sm:text-xl">{title}</AppCardTitle>
+        <AppCardTitle className="text-lg text-foreground sm:text-xl">{title}</AppCardTitle>
         {description && (
-          <AppCardDescription className="text-sm text-slate-500">
+          <AppCardDescription className="text-sm text-muted-foreground">
             {description}
           </AppCardDescription>
         )}
@@ -42,8 +42,8 @@ export function FormSection({
         {children}
       </AppCardContent>
       {onChainHint && (
-        <div className="border-t border-slate-100 px-6 py-4 sm:px-8">
-          <p className="flex items-center gap-2 text-xs text-slate-400">
+        <div className="border-t border-border px-6 py-4 sm:px-8">
+          <p className="flex items-center gap-2 text-xs text-muted-foreground">
             <span className="inline-block h-2 w-2 rounded-full bg-primary/60" />
             {onChainHint}
           </p>

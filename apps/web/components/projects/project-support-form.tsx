@@ -105,13 +105,13 @@ export function ProjectSupportForm({
 
   return (
     <form
-      className="w-full rounded-[28px] bg-white p-4 shadow-lg shadow-blue-950/5 ring-1 ring-slate-900/5 sm:p-6"
+      className="w-full rounded-xl bg-card p-4 shadow-card ring-1 ring-border sm:p-6"
       onSubmit={handleSupport}
     >
-      <h2 className="text-base font-semibold text-slate-900 sm:text-lg">
+      <h2 className="text-base font-semibold text-foreground sm:text-lg">
         Support the Project
       </h2>
-      <p className="mt-2 text-xs text-slate-500 sm:text-sm">
+      <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
         Your every support will be directly used for the project.
       </p>
 
@@ -124,9 +124,9 @@ export function ProjectSupportForm({
               type="button"
               onClick={() => handlePresetSelect(amount)}
               className={cn(
-                'w-full rounded-full border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition sm:px-4 sm:text-sm',
-                'hover:border-sky-400 hover:text-sky-500',
-                isActive && 'border-sky-500 bg-sky-50 text-sky-600'
+                'w-full rounded-full border border-border px-3 py-2 text-xs font-medium text-muted-foreground transition-base sm:px-4 sm:text-sm',
+                'hover:border-primary hover:text-primary',
+                isActive && 'border-primary bg-primary/10 text-primary'
               )}
               disabled={!isProjectOpen || isWriting}
             >
@@ -137,7 +137,7 @@ export function ProjectSupportForm({
       </div>
 
       <div className="mt-4 w-full space-y-2 sm:mt-6 sm:space-y-3">
-        <label className="text-xs font-medium text-slate-500" htmlFor="support-amount">
+        <label className="text-xs font-medium text-muted-foreground" htmlFor="support-amount">
           Custom Support Amount (ETH)
         </label>
         <AppInput
@@ -146,7 +146,7 @@ export function ProjectSupportForm({
           min="0"
           step="any"
           placeholder="0.1"
-          className="h-10 w-full rounded-full border-slate-200 text-sm sm:h-11"
+          className="h-10 w-full rounded-full border-border text-sm sm:h-11"
           value={amountInput}
           onChange={handleAmountChange}
           disabled={!isProjectOpen || isWriting}
@@ -154,14 +154,14 @@ export function ProjectSupportForm({
       </div>
 
       {formError ? (
-        <p className="mt-2 text-xs text-rose-500 sm:mt-3">{formError}</p>
+        <p className="mt-2 text-xs text-destructive sm:mt-3">{formError}</p>
       ) : feedback ? (
-        <p className="mt-2 text-xs text-emerald-600 sm:mt-3">
+        <p className="mt-2 text-xs text-success sm:mt-3">
           {feedback}
           {lastTxHash ? (
             <>
               {' '}
-              <span className="break-all text-[10px] text-emerald-500 sm:text-[11px]">
+              <span className="break-all text-[10px] text-success/80 sm:text-[11px]">
                 {lastTxHash}
               </span>
             </>
@@ -170,7 +170,7 @@ export function ProjectSupportForm({
       ) : null}
 
       {!isProjectOpen ? (
-        <p className="mt-2 text-xs text-slate-400 sm:mt-3">
+        <p className="mt-2 text-xs text-muted-foreground sm:mt-3">
           This project has ended or is not supported.
         </p>
       ) : null}
@@ -179,11 +179,12 @@ export function ProjectSupportForm({
         className="mt-4 w-full rounded-full text-xs sm:mt-6 sm:text-sm"
         type="submit"
         disabled={!isProjectOpen || isWriting}
+        glow="primary"
       >
         {isWriting ? 'Transaction Confirming...' : 'Support Now'}
       </AppButton>
 
-      <p className="mt-2 text-center text-xs text-slate-400 sm:mt-3">
+      <p className="mt-2 text-center text-xs text-muted-foreground sm:mt-3">
         Your support will be used for project execution, and cannot be refunded.
       </p>
     </form>

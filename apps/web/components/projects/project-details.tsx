@@ -45,7 +45,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
   return (
     <article className="w-full max-w-full space-y-6 overflow-x-hidden sm:space-y-10">
       {/* Hero Image */}
-      <div className="w-full max-w-full overflow-hidden rounded-[32px] bg-white shadow-xl shadow-blue-950/5 ring-1 ring-slate-900/5">
+      <div className="w-full max-w-full overflow-hidden rounded-2xl bg-card shadow-card ring-1 ring-border">
         <Image
           src={project.imageUrl}
           alt={project.title}
@@ -60,16 +60,16 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
         {/* Left Column - Main Content */}
         <div className="w-full max-w-full space-y-4 sm:space-y-6">
           {/* Project Header */}
-          <div className="w-full max-w-full rounded-[28px] bg-white p-4 shadow-lg shadow-blue-950/5 ring-1 ring-slate-900/5 sm:p-6 lg:p-8">
-            <div className="flex w-full max-w-full flex-wrap items-center gap-2 text-xs text-slate-500 sm:gap-3 sm:text-sm">
+          <div className="w-full max-w-full rounded-xl bg-card p-4 shadow-card ring-1 ring-border sm:p-6 lg:p-8">
+            <div className="flex w-full max-w-full flex-wrap items-center gap-2 text-xs text-muted-foreground sm:gap-3 sm:text-sm">
               <span className="break-all">Campaign ID: {project.id}</span>
-              <span className="inline-flex shrink-0 items-center rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600 sm:px-3">
+              <span className="inline-flex shrink-0 items-center rounded-full bg-muted px-2 py-1 text-xs font-medium text-muted-foreground sm:px-3">
                 {project.category}
               </span>
             </div>
 
             <div className="mt-3 flex w-full max-w-full flex-wrap items-center gap-2 sm:mt-4 sm:gap-3">
-              <h1 className="break-words text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl lg:text-3xl">
+              <h1 className="break-words text-xl font-semibold tracking-tight text-foreground sm:text-2xl lg:text-3xl">
                 {project.title}
               </h1>
               <AppBadge
@@ -79,7 +79,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
               </AppBadge>
             </div>
 
-            <p className="mt-3 break-words text-sm leading-relaxed text-slate-600 sm:mt-4 sm:text-base">
+            <p className="mt-3 break-words text-sm leading-relaxed text-muted-foreground sm:mt-4 sm:text-base">
               {project.summary}
             </p>
 
