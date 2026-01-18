@@ -74,7 +74,7 @@ async function fetchMetadata(uri: string): Promise<NormalisedMetadata> {
     const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
 
     const response = await fetch(url, {
-      cache: 'no-store',
+      cache: 'force-cache', // IPFS metadata is immutable, use cache
       signal: controller.signal,
     });
 
