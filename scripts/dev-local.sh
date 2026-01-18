@@ -124,10 +124,11 @@ if lsof -i:$ANVIL_PORT -t &>/dev/null; then
 fi
 
 if [ "${SKIP_ANVIL_START:-0}" != "1" ]; then
-    # 启动 Anvil (后台运行)
+    # 启动 Anvil (后台运行, 使用固定 mnemonic)
     anvil \
         --port $ANVIL_PORT \
         --chain-id $CHAIN_ID \
+        --mnemonic "test test test test test test test test test test test junk" \
         --accounts 10 \
         --balance 10000 \
         --block-time 1 \
