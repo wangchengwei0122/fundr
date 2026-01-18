@@ -5,7 +5,8 @@ import { useCallback, useEffect, useState } from 'react';
 import type { ProjectSummary } from '@/components/projects/types';
 import type { EdgeCampaign } from '@/src/lib/edge';
 import { fetchCampaignPage } from '@/src/lib/edge';
-import { patchCampaignsRealtime } from '@/src/lib/realtime';
+// [PERF] Removed patchCampaignsRealtime - Edge/API data is fresh enough (Indexer syncs every 30s)
+// import { patchCampaignsRealtime } from '@/src/lib/realtime';
 
 const DEFAULT_LIMIT = 12;
 const WEI_PER_ETH = 1_000_000_000_000_000_000n;
@@ -150,8 +151,28 @@ function computeProgress(goal: string, pledged: string) {
   }
 }
 
+/**
+ * Extract metadata from campaign - prefer API-provided metadata, fallback to IPFS
+ */
+function extractMetadataFromCampaign(campaign: EdgeCampaign): NormalisedMetadata | null {
+  const meta = campaign.metadata;
+  if (!meta || !meta.title) {
+    return null; // No pre-fetched metadata, will need IPFS fallback
+  }
+
+  return {
+    title: meta.title || FALLBACK_METADATA.title,
+    summary: meta.summary || meta.description || FALLBACK_METADATA.summary,
+    imageUrl: meta.imageUrl || meta.image || meta.cover || FALLBACK_METADATA.imageUrl,
+    category: meta.category || FALLBACK_METADATA.category,
+  };
+}
+
 async function mapCampaignToSummary(campaign: EdgeCampaign): Promise<ProjectSummary> {
-  const metadata = await fetchMetadata(campaign.metadataURI);
+  // [PERF] Prefer API-provided metadata to avoid IPFS requests
+  const apiMetadata = extractMetadataFromCampaign(campaign);
+  const metadata = apiMetadata ?? (await fetchMetadata(campaign.metadataURI));
+
   const pledgedAmount = toEth(campaign.totalPledged);
   const goalAmount = toEth(campaign.goal);
   const status = statusMap[campaign.status] ?? 'active';
@@ -191,9 +212,10 @@ export function useExplore(limit = DEFAULT_LIMIT): UseExploreReturn {
       setState((prev) => ({ ...prev, isLoading: true, isError: false }));
       try {
         const page = await fetchCampaignPage({ cursor, limit });
-        const patched = await patchCampaignsRealtime(page.campaigns);
+        // [PERF] Use Edge/API data directly without additional chain reads
+        // Indexer keeps data fresh (30s sync interval), realtime patch is unnecessary
         const projects = await Promise.all(
-          patched.map((campaign) => mapCampaignToSummary(campaign))
+          page.campaigns.map((campaign) => mapCampaignToSummary(campaign))
         );
 
         setState((prev) => ({

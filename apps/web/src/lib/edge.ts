@@ -11,6 +11,16 @@ export type EdgeCampaign = {
   metadataURI: string;
   createdAt: number;
   createdBlock: number;
+  // [PERF] Optional pre-fetched metadata from API (avoids IPFS requests)
+  metadata?: {
+    title?: string;
+    summary?: string;
+    description?: string;
+    imageUrl?: string;
+    image?: string;
+    cover?: string;
+    category?: string;
+  };
 };
 
 export type CampaignPage = {

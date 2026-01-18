@@ -8,7 +8,8 @@
       "Bash(chmod:*)",
       "Bash(pnpm install)",
       "Bash(npx tsc:*)",
-      "Bash(pnpm build:*)"
+      "Bash(pnpm build:*)",
+      "Bash(npm run lint:*)"
     ]
   }
 }
