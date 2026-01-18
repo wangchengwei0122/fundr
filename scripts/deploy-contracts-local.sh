@@ -243,7 +243,7 @@ FACTORY=$FACTORY_ADDRESS
 DEPLOY_BLOCK=$DEPLOY_BLOCK
 
 # Local Database
-DATABASE_URL=postgresql://localhost:5432/fundr_local
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/fundr_local?sslmode=disable
 
 # TLS (disabled for local dev)
 NODE_TLS_REJECT_UNAUTHORIZED=0
