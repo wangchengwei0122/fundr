@@ -114,7 +114,7 @@ AppCard.displayName = 'AppCard';
 // AppCardHeader
 // =============================================================================
 
-export interface AppCardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type AppCardHeaderProps = React.HTMLAttributes<HTMLDivElement>;
 
 const AppCardHeader = React.forwardRef<HTMLDivElement, AppCardHeaderProps>(
   ({ className, ...props }, ref) => {
@@ -166,7 +166,7 @@ AppCardTitle.displayName = 'AppCardTitle';
 // AppCardDescription
 // =============================================================================
 
-export interface AppCardDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {}
+export type AppCardDescriptionProps = React.HTMLAttributes<HTMLParagraphElement>;
 
 const AppCardDescription = React.forwardRef<HTMLParagraphElement, AppCardDescriptionProps>(
   ({ className, ...props }, ref) => {
@@ -187,7 +187,7 @@ AppCardDescription.displayName = 'AppCardDescription';
 // AppCardAction - For buttons/actions in header
 // =============================================================================
 
-export interface AppCardActionProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type AppCardActionProps = React.HTMLAttributes<HTMLDivElement>;
 
 const AppCardAction = React.forwardRef<HTMLDivElement, AppCardActionProps>(
   ({ className, ...props }, ref) => {
@@ -237,7 +237,7 @@ AppCardContent.displayName = 'AppCardContent';
 // AppCardFooter
 // =============================================================================
 
-export interface AppCardFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type AppCardFooterProps = React.HTMLAttributes<HTMLDivElement>;
 
 const AppCardFooter = React.forwardRef<HTMLDivElement, AppCardFooterProps>(
   ({ className, ...props }, ref) => {
