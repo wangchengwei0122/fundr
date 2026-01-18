@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useAccount, useBalance } from 'wagmi';
 import { formatUnits } from 'viem';
 
-import { Button } from '@/components/ui/button';
+import { AppButton } from '@/components/app';
 import { PageShell } from '@/components/blocks/layout/page-shell';
 import { Section } from '@/components/blocks/layout/section';
 import { IdentityHeader } from '@/components/blocks/identity/identity-header';
@@ -78,12 +78,12 @@ export default function AccountPage() {
         }
         actions={
           <>
-            <Button variant="outline" className="rounded-full" disabled>
+            <AppButton variant="outline" className="rounded-full" disabled>
               Edit Profile
-            </Button>
-            <Button asChild className="rounded-full">
+            </AppButton>
+            <AppButton asChild className="rounded-full">
               <Link href="/create">Create Campaign</Link>
-            </Button>
+            </AppButton>
           </>
         }
       />
@@ -116,9 +116,9 @@ export default function AccountPage() {
         description="Campaigns you have created"
         action={
           userCampaigns.length > 4 && (
-            <Button variant="ghost" size="sm" className="text-slate-500">
+            <AppButton variant="ghost" size="sm" className="text-slate-500">
               View All
-            </Button>
+            </AppButton>
           )
         }
       >
@@ -128,9 +128,9 @@ export default function AccountPage() {
           <EmptyState
             message="You haven't created any campaigns yet"
             action={
-              <Button asChild className="mt-4 rounded-full">
+              <AppButton asChild className="mt-4 rounded-full">
                 <Link href="/create">Create Your First Campaign</Link>
-              </Button>
+              </AppButton>
             }
           />
         ) : (
@@ -148,9 +148,9 @@ export default function AccountPage() {
         description="Projects you have supported"
         action={
           supportedCampaigns.length > 4 && (
-            <Button variant="ghost" size="sm" className="text-slate-500">
+            <AppButton variant="ghost" size="sm" className="text-slate-500">
               View All
-            </Button>
+            </AppButton>
           )
         }
       >
@@ -160,9 +160,9 @@ export default function AccountPage() {
           <EmptyState
             message="You haven't backed any campaigns yet"
             action={
-              <Button asChild variant="outline" className="mt-4 rounded-full">
+              <AppButton asChild variant="outline" className="mt-4 rounded-full">
                 <Link href="/projects">Explore Campaigns</Link>
-              </Button>
+              </AppButton>
             }
           />
         ) : (

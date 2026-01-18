@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { AppButton, AppBadge } from '@/components/app';
 import type { ProjectSummary } from "./types";
 
 export type FeaturedProjectHeroProps = {
@@ -48,9 +47,9 @@ export function FeaturedProjectHero({ project }: FeaturedProjectHeroProps) {
 
       <div className="flex w-full max-w-full flex-col gap-6 self-center sm:gap-8">
         <div className="space-y-3 sm:space-y-4">
-          <Badge variant="secondary" className="rounded-full bg-blue-100 px-3 py-1 text-blue-700">
+          <AppBadge variant="secondary" className="rounded-full bg-blue-100 px-3 py-1 text-blue-700">
             Featured Project
-          </Badge>
+          </AppBadge>
           <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
             {project.title}
           </h1>
@@ -76,9 +75,9 @@ export function FeaturedProjectHero({ project }: FeaturedProjectHeroProps) {
         </div>
 
         <div className="flex w-full max-w-full flex-wrap gap-3">
-          <Button asChild className="w-full rounded-full px-6 text-sm sm:w-auto">
+          <AppButton asChild className="w-full rounded-full px-6 text-sm sm:w-auto">
             <Link href={`/projects/${project.id}`}>Support Project</Link>
-          </Button>
+          </AppButton>
         </div>
       </div>
     </section>

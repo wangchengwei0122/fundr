@@ -5,7 +5,7 @@ import Image from 'next/image';
 import type { Address } from 'viem';
 import { useAccount } from 'wagmi';
 
-import { Badge } from '@/components/ui/badge';
+import { AppBadge } from '@/components/app';
 import { getDaysLeft } from '@/lib/format';
 import { PROJECT_STATUS_STYLES, PROJECT_STATUS_LABELS } from '@/lib/constants';
 
@@ -72,11 +72,11 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
               <h1 className="break-words text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl lg:text-3xl">
                 {project.title}
               </h1>
-              <Badge
+              <AppBadge
                 className={`shrink-0 rounded-full px-2 py-1 text-xs font-semibold sm:px-3 ${PROJECT_STATUS_STYLES[derivedStatus]}`}
               >
                 {PROJECT_STATUS_LABELS[derivedStatus]}
-              </Badge>
+              </AppBadge>
             </div>
 
             <p className="mt-3 break-words text-sm leading-relaxed text-slate-600 sm:mt-4 sm:text-base">

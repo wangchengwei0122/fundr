@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 
-import { Button } from '@/components/ui/button';
+import { AppButton } from '@/components/app';
 import { ProjectList } from '@/components/projects/project-list';
 import { useExplore } from '@/src/hooks/useExplore';
 
@@ -86,14 +86,14 @@ export default function ProjectsPage() {
               Data source: {source === 'edge' ? 'Edge Cache' : 'Chain Fallback'}
             </p>
             <div className="flex w-full max-w-full items-center justify-center">
-              <Button
+              <AppButton
                 onClick={loadMore}
                 disabled={!hasMore || isLoading}
                 variant="outline"
                 className="w-full rounded-full px-6 sm:w-auto"
               >
                 {hasMore ? (isLoading ? 'Loading...' : 'Load More') : 'No more projects'}
-              </Button>
+              </AppButton>
             </div>
           </div>
         )}

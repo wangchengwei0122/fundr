@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { MenuIcon, XIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { AppButton } from '@/components/app';
 
 const navItems = [
   { href: '/', label: 'Discover' },
@@ -51,7 +51,7 @@ export function SiteNavbar() {
             <div className="sm:hidden">
               <ConnectButton accountStatus="avatar" showBalance={false} chainStatus="icon" />
             </div>
-            <Button
+            <AppButton
               variant="ghost"
               size="icon"
               className="md:hidden"
@@ -59,7 +59,7 @@ export function SiteNavbar() {
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? <XIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
-            </Button>
+            </AppButton>
           </div>
         </div>
       </header>

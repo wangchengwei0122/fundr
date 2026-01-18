@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AppCard, AppCardContent, AppCardDescription, AppCardHeader, AppCardTitle } from '@/components/app';
 
 import { ProjectCard } from './project-card';
 import type { ProjectSummary } from './types';
@@ -12,17 +12,17 @@ export type ProjectListProps = {
 export function ProjectList({ projects }: ProjectListProps) {
   if (projects.length === 0) {
     return (
-      <Card className="border-dashed bg-white/60">
-        <CardHeader>
-          <CardTitle className="text-center text-lg">No projects found</CardTitle>
-          <CardDescription className="text-center">
+      <AppCard className="border-dashed bg-white/60">
+        <AppCardHeader>
+          <AppCardTitle className="text-center text-lg">No projects found</AppCardTitle>
+          <AppCardDescription className="text-center">
             Be the first to launch a project and start your Web3 crowdfunding journey.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pb-6 text-center text-sm text-slate-500">
+          </AppCardDescription>
+        </AppCardHeader>
+        <AppCardContent className="pb-6 text-center text-sm text-slate-500">
           Future projects will be displayed here.
-        </CardContent>
-      </Card>
+        </AppCardContent>
+      </AppCard>
     );
   }
 

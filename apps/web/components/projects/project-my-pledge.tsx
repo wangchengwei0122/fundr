@@ -5,8 +5,7 @@ import type { Address } from 'viem';
 import { formatEther } from 'viem';
 import { useAccount, useReadContract, useWriteContract } from 'wagmi';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AppButton, AppCard, AppCardContent, AppCardHeader, AppCardTitle } from '@/components/app';
 import { campaignAbi } from '@/lib/abi';
 import { formatEth } from '@/lib/format';
 
@@ -114,13 +113,13 @@ export function ProjectMyPledge({
   }
 
   return (
-    <Card className="w-full rounded-[28px] border-0 bg-white p-4 shadow-lg shadow-blue-950/5 ring-1 ring-slate-900/5 sm:p-6">
-      <CardHeader className="px-0">
-        <CardTitle className="text-base font-semibold text-slate-900 sm:text-lg">
+    <AppCard className="w-full rounded-[28px] border-0 bg-white p-4 shadow-lg shadow-blue-950/5 ring-1 ring-slate-900/5 sm:p-6">
+      <AppCardHeader className="px-0">
+        <AppCardTitle className="text-base font-semibold text-slate-900 sm:text-lg">
           My Pledge
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="px-0 text-xs text-slate-500 sm:text-sm">
+        </AppCardTitle>
+      </AppCardHeader>
+      <AppCardContent className="px-0 text-xs text-slate-500 sm:text-sm">
         <div className="space-y-2 sm:space-y-3">
           <p className="text-slate-600">
             {isReadingPledge
@@ -131,24 +130,24 @@ export function ProjectMyPledge({
             <p className="text-xs text-rose-500">{formError}</p>
           )}
           <div className="grid w-full grid-cols-2 gap-2 sm:gap-3">
-            <Button
+            <AppButton
               className="w-full rounded-full text-xs sm:text-sm"
               variant="secondary"
               onClick={handleUnpledgeAll}
               disabled={!canUnpledge || isWriting}
             >
               {isWriting ? 'Processing...' : 'Unpledge All'}
-            </Button>
-            <Button
+            </AppButton>
+            <AppButton
               className="w-full rounded-full text-xs sm:text-sm"
               onClick={handleRefund}
               disabled={!canRefund || isWriting}
             >
               {isWriting ? 'Processing...' : 'Refund'}
-            </Button>
+            </AppButton>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </AppCardContent>
+    </AppCard>
   );
 }

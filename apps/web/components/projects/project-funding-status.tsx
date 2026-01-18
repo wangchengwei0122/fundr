@@ -1,6 +1,6 @@
 import { formatEth, getProgress, getDaysLeft } from '@/lib/format';
 import { PROJECT_STATUS_STYLES, PROJECT_STATUS_LABELS } from '@/lib/constants';
-import { Badge } from '@/components/ui/badge';
+import { AppBadge } from '@/components/app';
 import type { ProjectStatus } from './types';
 
 export type ProjectFundingStatusProps = {
@@ -27,11 +27,11 @@ export function ProjectFundingStatus({
   return (
     <div className="grid w-full gap-4 rounded-[24px] bg-slate-50 p-4 sm:gap-6 sm:p-6">
       <div className="flex items-center justify-between">
-        <Badge
+        <AppBadge
           className={`rounded-full px-3 py-1 text-xs font-semibold ${PROJECT_STATUS_STYLES[derivedStatus]}`}
         >
           {PROJECT_STATUS_LABELS[derivedStatus]}
-        </Badge>
+        </AppBadge>
         <span className="text-xs text-slate-500">
           {daysLeft > 0 ? `${daysLeft} days left` : 'Ended'}
         </span>

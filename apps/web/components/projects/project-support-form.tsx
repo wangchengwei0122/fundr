@@ -5,8 +5,7 @@ import type { Address, Hash } from 'viem';
 import { parseEther } from 'viem';
 import { useAccount, useWriteContract } from 'wagmi';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { AppButton, AppInput } from '@/components/app';
 import { cn } from '@/lib/utils';
 import { campaignAbi } from '@/lib/abi';
 import { PRESET_SUPPORT_AMOUNTS } from '@/lib/constants';
@@ -141,7 +140,7 @@ export function ProjectSupportForm({
         <label className="text-xs font-medium text-slate-500" htmlFor="support-amount">
           Custom Support Amount (ETH)
         </label>
-        <Input
+        <AppInput
           id="support-amount"
           type="number"
           min="0"
@@ -176,13 +175,13 @@ export function ProjectSupportForm({
         </p>
       ) : null}
 
-      <Button
+      <AppButton
         className="mt-4 w-full rounded-full text-xs sm:mt-6 sm:text-sm"
         type="submit"
         disabled={!isProjectOpen || isWriting}
       >
         {isWriting ? 'Transaction Confirming...' : 'Support Now'}
-      </Button>
+      </AppButton>
 
       <p className="mt-2 text-center text-xs text-slate-400 sm:mt-3">
         Your support will be used for project execution, and cannot be refunded.

@@ -1,11 +1,11 @@
 import { cn } from '@/lib/utils';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+  AppCard,
+  AppCardContent,
+  AppCardDescription,
+  AppCardHeader,
+  AppCardTitle,
+} from '@/components/app';
 
 export type FormSectionProps = {
   title: string;
@@ -24,23 +24,23 @@ export function FormSection({
   className,
 }: FormSectionProps) {
   return (
-    <Card
+    <AppCard
       className={cn(
         'rounded-[28px] border-0 bg-white shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5',
         className
       )}
     >
-      <CardHeader className="px-6 sm:px-8">
-        <CardTitle className="text-lg text-slate-900 sm:text-xl">{title}</CardTitle>
+      <AppCardHeader className="px-6 sm:px-8">
+        <AppCardTitle className="text-lg text-slate-900 sm:text-xl">{title}</AppCardTitle>
         {description && (
-          <CardDescription className="text-sm text-slate-500">
+          <AppCardDescription className="text-sm text-slate-500">
             {description}
-          </CardDescription>
+          </AppCardDescription>
         )}
-      </CardHeader>
-      <CardContent className="space-y-4 px-6 pb-6 sm:space-y-6 sm:px-8 sm:pb-8">
+      </AppCardHeader>
+      <AppCardContent className="space-y-4 px-6 pb-6 sm:space-y-6 sm:px-8 sm:pb-8">
         {children}
-      </CardContent>
+      </AppCardContent>
       {onChainHint && (
         <div className="border-t border-slate-100 px-6 py-4 sm:px-8">
           <p className="flex items-center gap-2 text-xs text-slate-400">
@@ -49,6 +49,6 @@ export function FormSection({
           </p>
         </div>
       )}
-    </Card>
+    </AppCard>
   );
 }

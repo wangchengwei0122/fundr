@@ -4,8 +4,7 @@ import { useCallback, useState } from 'react';
 import type { Address } from 'viem';
 import { useAccount, useWriteContract } from 'wagmi';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AppButton, AppCard, AppCardContent, AppCardHeader, AppCardTitle } from '@/components/app';
 import { campaignAbi } from '@/lib/abi';
 
 export type ProjectClaimPanelProps = {
@@ -48,27 +47,27 @@ export function ProjectClaimPanel({
   }, [campaignAddress, isConnected, writeContractAsync, onSuccess]);
 
   return (
-    <Card className="w-full rounded-[28px] border-0 bg-white p-4 shadow-lg shadow-blue-950/5 ring-1 ring-slate-900/5 sm:p-6">
-      <CardHeader className="px-0">
-        <CardTitle className="text-base font-semibold text-slate-900 sm:text-lg">
+    <AppCard className="w-full rounded-[28px] border-0 bg-white p-4 shadow-lg shadow-blue-950/5 ring-1 ring-slate-900/5 sm:p-6">
+      <AppCardHeader className="px-0">
+        <AppCardTitle className="text-base font-semibold text-slate-900 sm:text-lg">
           Claim Funds
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="px-0 text-xs text-slate-500 sm:text-sm">
+        </AppCardTitle>
+      </AppCardHeader>
+      <AppCardContent className="px-0 text-xs text-slate-500 sm:text-sm">
         <p className="mb-3 text-slate-600 sm:mb-4">
           The campaign reached its goal. You can finalize to claim funds.
         </p>
         {formError && (
           <p className="mb-3 text-xs text-rose-500">{formError}</p>
         )}
-        <Button
+        <AppButton
           className="w-full rounded-full text-xs sm:w-auto sm:text-sm"
           onClick={handleFinalize}
           disabled={isWriting}
         >
           {isWriting ? 'Processing...' : 'Finalize & Claim'}
-        </Button>
-      </CardContent>
-    </Card>
+        </AppButton>
+      </AppCardContent>
+    </AppCard>
   );
 }

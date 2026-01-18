@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-import { Button } from '@/components/ui/button';
+import { AppButton, AppBadge } from '@/components/app';
 import { PageShell } from '@/components/blocks/layout/page-shell';
 import { Section } from '@/components/blocks/layout/section';
 import { HeroBlock } from '@/components/blocks/display/hero-block';
@@ -14,7 +14,6 @@ import type { ProjectSummary } from '@/components/projects/types';
 import { useExplore } from '@/src/hooks/useExplore';
 import { formatEth, getDaysLeft, getProgress } from '@/lib/format';
 import { PROJECT_STATUS_STYLES, PROJECT_STATUS_LABELS, PLATFORM_STATS } from '@/lib/constants';
-import { Badge } from '@/components/ui/badge';
 
 const FALLBACK_FEATURED: ProjectSummary = {
   id: 'eco-farm',
@@ -71,12 +70,12 @@ export default function HomePage() {
         variant="gradient"
         actions={
           <>
-            <Button size="lg" className="rounded-full px-8" asChild>
+            <AppButton size="lg" className="rounded-full px-8" asChild>
               <Link href="/create">Start a Campaign</Link>
-            </Button>
-            <Button size="lg" variant="outline" className="rounded-full px-8" asChild>
+            </AppButton>
+            <AppButton size="lg" variant="outline" className="rounded-full px-8" asChild>
               <Link href="/projects">Explore Projects</Link>
-            </Button>
+            </AppButton>
           </>
         }
       />
@@ -142,9 +141,9 @@ export default function HomePage() {
                 </button>
               ))}
             </div>
-            <Button asChild variant="outline" className="rounded-full px-5 text-sm">
+            <AppButton asChild variant="outline" className="rounded-full px-5 text-sm">
               <Link href="/projects">View All</Link>
-            </Button>
+            </AppButton>
           </div>
         }
       >
@@ -166,14 +165,14 @@ export default function HomePage() {
 
         {projects.length > 0 && (
           <div className="mt-8 flex flex-col items-center gap-3">
-            <Button
+            <AppButton
               onClick={loadMore}
               disabled={!hasMore || isLoading}
               variant="outline"
               className="rounded-full px-8"
             >
               {hasMore ? (isLoading ? 'Loading...' : 'Load More') : 'No more projects'}
-            </Button>
+            </AppButton>
             <p className="text-xs text-slate-400">
               Data source: {source === 'edge' ? 'Edge Cache' : 'Chain Fallback'}
             </p>
@@ -206,14 +205,14 @@ function FeaturedCampaign({ project }: { project: ProjectSummary }) {
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
           <div className="absolute left-4 top-4 flex gap-2">
-            <Badge className="rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-slate-700 backdrop-blur-sm">
+            <AppBadge className="rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-slate-700 backdrop-blur-sm">
               {project.category}
-            </Badge>
-            <Badge
+            </AppBadge>
+            <AppBadge
               className={`rounded-full px-3 py-1 text-xs font-semibold ${PROJECT_STATUS_STYLES[derivedStatus]}`}
             >
               {PROJECT_STATUS_LABELS[derivedStatus]}
-            </Badge>
+            </AppBadge>
           </div>
         </div>
 
@@ -259,9 +258,9 @@ function FeaturedCampaign({ project }: { project: ProjectSummary }) {
               </div>
             </div>
 
-            <Button className="w-full rounded-full" size="lg">
+            <AppButton className="w-full rounded-full" size="lg">
               View Campaign
-            </Button>
+            </AppButton>
           </div>
         </div>
       </div>

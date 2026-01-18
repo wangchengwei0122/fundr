@@ -7,8 +7,7 @@ import type { Address, Hash } from 'viem';
 import { parseEther, decodeEventLog } from 'viem';
 import { useAccount, usePublicClient, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { AppButton, AppInput } from '@/components/app';
 import { PageShell } from '@/components/blocks/layout/page-shell';
 import { Section } from '@/components/blocks/layout/section';
 import { StepIndicator } from '@/components/blocks/form/step-indicator';
@@ -275,16 +274,16 @@ export default function CreatePage() {
 
               <div className="flex flex-col gap-3 sm:flex-row">
                 {createdCampaignAddress && (
-                  <Button
+                  <AppButton
                     asChild
                     className="rounded-full bg-emerald-600 px-8 hover:bg-emerald-700"
                   >
                     <Link href={`/projects/${createdCampaignAddress}`}>View Campaign</Link>
-                  </Button>
+                  </AppButton>
                 )}
-                <Button asChild variant="outline" className="rounded-full px-8">
+                <AppButton asChild variant="outline" className="rounded-full px-8">
                   <Link href="/">Back to Home</Link>
-                </Button>
+                </AppButton>
               </div>
             </div>
           </div>
@@ -319,7 +318,7 @@ export default function CreatePage() {
                   <label className="text-sm font-medium text-slate-700" htmlFor="title">
                     Project Title <span className="text-rose-500">*</span>
                   </label>
-                  <Input
+                  <AppInput
                     id="title"
                     value={formData.title}
                     onChange={(e) => updateField('title', e.target.value)}
@@ -331,7 +330,7 @@ export default function CreatePage() {
                   <label className="text-sm font-medium text-slate-700" htmlFor="tagline">
                     Tagline <span className="text-rose-500">*</span>
                   </label>
-                  <Input
+                  <AppInput
                     id="tagline"
                     value={formData.tagline}
                     onChange={(e) => updateField('tagline', e.target.value)}
@@ -374,7 +373,7 @@ export default function CreatePage() {
                     <label className="text-sm font-medium text-slate-700" htmlFor="cover">
                       Cover Image URL
                     </label>
-                    <Input
+                    <AppInput
                       id="cover"
                       value={formData.cover}
                       onChange={(e) => updateField('cover', e.target.value)}
@@ -400,7 +399,7 @@ export default function CreatePage() {
                     <label className="text-sm font-medium text-slate-700" htmlFor="goal">
                       Goal Amount (ETH) <span className="text-rose-500">*</span>
                     </label>
-                    <Input
+                    <AppInput
                       id="goal"
                       type="number"
                       step="any"
@@ -414,7 +413,7 @@ export default function CreatePage() {
                     <label className="text-sm font-medium text-slate-700" htmlFor="deadline">
                       Deadline <span className="text-rose-500">*</span>
                     </label>
-                    <Input
+                    <AppInput
                       id="deadline"
                       type="date"
                       value={formData.deadline}
@@ -469,7 +468,7 @@ export default function CreatePage() {
 
           {/* Navigation */}
           <div className="flex justify-between pt-4">
-            <Button
+            <AppButton
               type="button"
               variant="outline"
               onClick={handleBack}
@@ -477,24 +476,24 @@ export default function CreatePage() {
               className="rounded-full px-6"
             >
               Back
-            </Button>
+            </AppButton>
 
             {currentStep < CREATE_STEPS.length - 1 ? (
-              <Button
+              <AppButton
                 type="button"
                 onClick={handleNext}
                 className="rounded-full px-6"
               >
                 Continue
-              </Button>
+              </AppButton>
             ) : (
-              <Button
+              <AppButton
                 type="submit"
                 disabled={submitDisabled}
                 className="rounded-full px-6"
               >
                 {submitLabel}
-              </Button>
+              </AppButton>
             )}
           </div>
 
