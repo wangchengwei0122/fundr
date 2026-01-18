@@ -6,7 +6,8 @@
       "Bash(pnpm run build)",
       "Bash(tree:*)",
       "Bash(chmod:*)",
-      "Bash(pnpm install)"
+      "Bash(pnpm install)",
+      "Bash(npx tsc:*)"
     ]
   }
 }
