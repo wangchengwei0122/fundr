@@ -29,6 +29,7 @@
 	// Production environment variables (used on deploy)
 	// NOTE: Local development uses .dev.vars instead
 	"vars": {
-		"API_URL": "https://fundr-4gnq.onrender.com"
+		"API_URL": "https://fundr-4gnq.onrender.com",
+		"CHAIN_ID": "11155111"
 	}
 }

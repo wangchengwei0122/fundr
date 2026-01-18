@@ -17,6 +17,7 @@
 interface Env {
 	KV: KVNamespace;
 	API_URL: string; // Base URL for apps/api (e.g., "http://localhost:3001")
+	CHAIN_ID: string; // Chain ID for KV key namespacing (e.g., "11155111" for Sepolia)
 }
 
 interface ApiSuccessResponse<T = unknown> {
@@ -136,20 +137,21 @@ async function fetchFromApi<T = unknown>(env: Env, path: string, options: Reques
 const CACHE_TTL = 60; // Default cache TTL in seconds (30-120s range)
 
 /**
- * KV key prefixes for backward compatibility
+ * KV key prefixes - includes chainId to prevent cross-network data collision
+ * Format: kv:${CHAIN_ID}:<resource>:<params>
  */
 function kvKeyLatest(env: Env): string {
-	return 'kv:crowd:latest';
+	return `kv:${env.CHAIN_ID}:crowd:latest`;
 }
 
 function kvKeyCampaign(env: Env, address: string): string {
 	const normalized = address.toLowerCase();
-	return `kv:crowd:campaign:${normalized}`;
+	return `kv:${env.CHAIN_ID}:crowd:campaign:${normalized}`;
 }
 
 function kvKeyMeta(env: Env, address: string): string {
 	const normalized = address.toLowerCase();
-	return `kv:crowd:meta:${normalized}`;
+	return `kv:${env.CHAIN_ID}:crowd:meta:${normalized}`;
 }
 
 /**
@@ -178,24 +180,40 @@ async function cacheSet(env: Env, key: string, value: unknown, ttlSeconds: numbe
 }
 
 /**
- * Read-through cache wrapper (stale-while-revalidate pattern)
- *
- * TODO: Implement detailed caching rules in next iteration
+ * Cache result with stale indicator
  */
-async function withCache<T>(env: Env, key: string, fetcher: () => Promise<T>, ttlSeconds: number = CACHE_TTL): Promise<T> {
+interface CacheResult<T> {
+	data: T;
+	stale: boolean;
+}
+
+/**
+ * Read-through cache wrapper with stale fallback
+ *
+ * Behavior:
+ * - Cache hit + fetch success: return fresh data, update cache
+ * - Cache hit + fetch fail: return stale cached data
+ * - Cache miss + fetch success: return fresh data, set cache
+ * - Cache miss + fetch fail: throw error (no fallback available)
+ */
+async function withCache<T>(env: Env, key: string, fetcher: () => Promise<T>, ttlSeconds: number = CACHE_TTL): Promise<CacheResult<T>> {
 	// Try to get from cache first
 	const cached = await cacheGet<T>(env, key);
-	if (cached !== null) {
-		// Return cached value immediately, refresh in background
-		// Note: In Cloudflare Workers, we can't truly background refresh,
-		// but we can return stale data if fetch fails
-		return cached;
-	}
 
-	// Cache miss: fetch fresh data
-	const fresh = await fetcher();
-	await cacheSet(env, key, fresh, ttlSeconds);
-	return fresh;
+	try {
+		// Always attempt to fetch fresh data
+		const fresh = await fetcher();
+		await cacheSet(env, key, fresh, ttlSeconds);
+		return { data: fresh, stale: false };
+	} catch (fetchError) {
+		// Fetch failed - if we have cached data, return it as stale
+		if (cached !== null) {
+			console.warn(`[withCache] Fetch failed for ${key}, returning stale cache`);
+			return { data: cached, stale: true };
+		}
+		// No cache available - re-throw the error
+		throw fetchError;
+	}
 }
 
 // ============================================================================
@@ -228,9 +246,9 @@ async function handleCampaignsRequest(request: Request, env: Env): Promise<Respo
 	// Calculate page number from cursor (API uses page-based pagination)
 	const page = Math.floor(cursor / limit) + 1;
 
-	// Fetch from API with caching
-	const cacheKey = `campaigns:${sort}:${page}:${limit}`;
-	const apiResponse = await withCache(
+	// Fetch from API with caching - include chainId to prevent cross-network collision
+	const cacheKey = `kv:${env.CHAIN_ID}:campaigns:${sort}:${page}:${limit}`;
+	const cacheResult = await withCache(
 		env,
 		cacheKey,
 		async () => {
@@ -254,11 +272,12 @@ async function handleCampaignsRequest(request: Request, env: Env): Promise<Respo
 	);
 
 	// Transform API response to backward-compatible format
-	const campaigns = apiResponse.items || [];
-	const total = apiResponse.pagination.total || 0;
+	const apiData = cacheResult.data;
+	const campaigns = apiData.items || [];
+	const total = apiData.pagination.total || 0;
 	const nextCursor = cursor + campaigns.length < total ? cursor + campaigns.length : null;
 
-	const body: CampaignListResponse = {
+	const body: CampaignListResponse & { stale?: boolean } = {
 		campaigns,
 		cursor,
 		nextCursor,
@@ -266,6 +285,11 @@ async function handleCampaignsRequest(request: Request, env: Env): Promise<Respo
 		sort,
 		total,
 	};
+
+	// Add stale indicator if data is from cache fallback
+	if (cacheResult.stale) {
+		body.stale = true;
+	}
 
 	return jsonResponse(body, { status: 200, headers: { 'Cache-Control': 'public, max-age=60' } });
 }
@@ -282,7 +306,7 @@ async function handleCampaignDetailRequest(request: Request, env: Env, address: 
 
 	// Fetch from API with caching
 	const cacheKey = kvKeyCampaign(env, address);
-	const apiResponse = await withCache(
+	const cacheResult = await withCache(
 		env,
 		cacheKey,
 		async () => {
@@ -297,7 +321,13 @@ async function handleCampaignDetailRequest(request: Request, env: Env, address: 
 		120, // Cache for 120 seconds
 	);
 
-	return jsonResponse(apiResponse, { status: 200, headers: { 'Cache-Control': 'public, max-age=120' } });
+	// Build response with optional stale indicator
+	const body: CampaignRecord & { stale?: boolean } = { ...cacheResult.data };
+	if (cacheResult.stale) {
+		body.stale = true;
+	}
+
+	return jsonResponse(body, { status: 200, headers: { 'Cache-Control': 'public, max-age=120' } });
 }
 
 /**
@@ -326,8 +356,8 @@ async function handleHealthRequest(env: Env): Promise<Response> {
  * Maps to API /stats
  */
 async function handleStatsRequest(env: Env): Promise<Response> {
-	const cacheKey = 'stats:global';
-	const apiResponse = await withCache(
+	const cacheKey = `kv:${env.CHAIN_ID}:stats:global`;
+	const cacheResult = await withCache(
 		env,
 		cacheKey,
 		async () => {
@@ -342,7 +372,12 @@ async function handleStatsRequest(env: Env): Promise<Response> {
 		120, // Cache for 120 seconds
 	);
 
-	return jsonResponse(apiResponse, { status: 200, headers: { 'Cache-Control': 'public, max-age=120' } });
+	// Build response with optional stale indicator
+	const body = cacheResult.stale
+		? { ...cacheResult.data as object, stale: true }
+		: cacheResult.data;
+
+	return jsonResponse(body, { status: 200, headers: { 'Cache-Control': 'public, max-age=120' } });
 }
 
 /**
