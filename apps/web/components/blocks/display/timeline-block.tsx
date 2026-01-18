@@ -17,19 +17,19 @@ export type TimelineBlockProps = {
 
 const statusStyles = {
   completed: {
-    dot: 'bg-emerald-500',
-    line: 'bg-emerald-500',
-    text: 'text-slate-900',
+    dot: 'bg-success',
+    line: 'bg-success',
+    text: 'text-foreground',
   },
   current: {
     dot: 'bg-primary ring-4 ring-primary/20',
-    line: 'bg-slate-200',
-    text: 'text-slate-900 font-medium',
+    line: 'bg-border',
+    text: 'text-foreground font-medium',
   },
   upcoming: {
-    dot: 'bg-slate-200',
-    line: 'bg-slate-200',
-    text: 'text-slate-400',
+    dot: 'bg-muted',
+    line: 'bg-border',
+    text: 'text-muted-foreground',
   },
 };
 
@@ -65,7 +65,7 @@ export function TimelineBlock({
                   {item.title}
                 </p>
                 {item.timestamp && (
-                  <p className="mt-1 text-xs text-slate-400">{item.timestamp}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{item.timestamp}</p>
                 )}
               </div>
             </div>
@@ -94,10 +94,10 @@ export function TimelineBlock({
               {item.title}
             </p>
             {item.description && (
-              <p className="mt-1 text-sm text-slate-500">{item.description}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{item.description}</p>
             )}
             {item.timestamp && (
-              <p className="mt-1 text-xs text-slate-400">{item.timestamp}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{item.timestamp}</p>
             )}
           </div>
         </div>

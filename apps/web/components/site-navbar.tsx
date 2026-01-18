@@ -19,16 +19,16 @@ export function SiteNavbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/80 backdrop-blur-md">
+      <header className="sticky top-0 z-50 w-full border-b border-border/80 bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-4 py-4 sm:px-6">
           <Link href="/" className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-sm">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-sm">
               <span className="text-lg font-semibold">F</span>
             </span>
-            <span className="text-lg font-semibold text-slate-900">Fundr</span>
+            <span className="text-lg font-semibold text-foreground">Fundr</span>
           </Link>
 
-          <nav className="hidden items-center gap-8 text-sm font-medium text-slate-500 md:flex">
+          <nav className="hidden items-center gap-8 text-sm font-medium text-muted-foreground md:flex">
             {navItems.map((item) => {
               const isActive =
                 pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href));
@@ -36,7 +36,7 @@ export function SiteNavbar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`transition hover:text-slate-900 ${isActive ? 'text-slate-900' : ''}`}
+                  className={`transition-base hover:text-foreground ${isActive ? 'text-foreground' : ''}`}
                 >
                   {item.label}
                 </Link>
@@ -68,13 +68,13 @@ export function SiteNavbar() {
         <>
           {/* Backdrop overlay - only covers content below navbar */}
           <div
-            className="fixed inset-x-0 bottom-0 top-[73px] z-30 bg-black/50 backdrop-blur-sm md:hidden"
+            className="fixed inset-x-0 bottom-0 top-[73px] z-30 bg-foreground/50 backdrop-blur-sm md:hidden"
             onClick={() => setMobileMenuOpen(false)}
             aria-hidden="true"
           />
           {/* Mobile menu */}
           <div className="fixed inset-x-0 top-[73px] z-40 md:hidden">
-            <div className="border border-slate-200/80 bg-white shadow-xl">
+            <div className="border border-border/80 bg-card shadow-float">
               <nav className="flex flex-col gap-1 p-2">
                 {navItems.map((item) => {
                   const isActive =
@@ -85,10 +85,10 @@ export function SiteNavbar() {
                       key={item.href}
                       href={item.href}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`rounded-lg px-4 py-3 text-base font-medium transition ${
+                      className={`rounded-lg px-4 py-3 text-base font-medium transition-base ${
                         isActive
-                          ? 'bg-slate-100 text-slate-900'
-                          : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                          ? 'bg-accent text-foreground'
+                          : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                       }`}
                     >
                       {item.label}

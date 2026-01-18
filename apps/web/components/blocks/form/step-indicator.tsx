@@ -37,11 +37,11 @@ export function StepIndicator({
                 onClick={() => isClickable && onStepClick(index)}
                 disabled={!isClickable}
                 className={cn(
-                  'flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition',
+                  'flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition-base',
                   'sm:px-4',
-                  isCompleted && 'bg-emerald-100 text-emerald-700',
+                  isCompleted && 'bg-success/10 text-success',
                   isCurrent && 'bg-primary text-primary-foreground',
-                  !isCompleted && !isCurrent && 'bg-slate-100 text-slate-400',
+                  !isCompleted && !isCurrent && 'bg-muted text-muted-foreground',
                   isClickable && 'cursor-pointer hover:opacity-80',
                   !isClickable && 'cursor-default'
                 )}
@@ -49,9 +49,9 @@ export function StepIndicator({
                 <span
                   className={cn(
                     'flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold',
-                    isCompleted && 'bg-emerald-600 text-white',
-                    isCurrent && 'bg-white/20',
-                    !isCompleted && !isCurrent && 'bg-slate-200'
+                    isCompleted && 'bg-success text-success-foreground',
+                    isCurrent && 'bg-primary-foreground/20',
+                    !isCompleted && !isCurrent && 'bg-border'
                   )}
                 >
                   {isCompleted ? '\u2713' : index + 1}
@@ -62,7 +62,7 @@ export function StepIndicator({
                 <div
                   className={cn(
                     'h-0.5 w-8 sm:w-12',
-                    index < currentStep ? 'bg-emerald-500' : 'bg-slate-200'
+                    index < currentStep ? 'bg-success' : 'bg-border'
                   )}
                 />
               )}

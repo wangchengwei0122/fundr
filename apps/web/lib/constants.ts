@@ -28,8 +28,8 @@ export const PROJECT_STATUS_CONFIG: Record<
   },
   cancelled: {
     label: 'Cancelled',
-    bgClass: 'bg-slate-100',
-    textClass: 'text-slate-500',
+    bgClass: 'bg-muted',
+    textClass: 'text-muted-foreground',
   },
 };
 
@@ -37,10 +37,10 @@ export const PROJECT_STATUS_CONFIG: Record<
  * Fallback status config using standard Tailwind classes (for backward compatibility)
  */
 export const PROJECT_STATUS_STYLES: Record<ProjectStatus, string> = {
-  active: 'bg-blue-100 text-blue-600',
-  successful: 'bg-emerald-100 text-emerald-600',
-  failed: 'bg-rose-100 text-rose-600',
-  cancelled: 'bg-slate-100 text-slate-500',
+  active: 'bg-status-active-bg text-status-active-text',
+  successful: 'bg-status-successful-bg text-status-successful-text',
+  failed: 'bg-status-failed-bg text-status-failed-text',
+  cancelled: 'bg-muted text-muted-foreground',
 };
 
 /**

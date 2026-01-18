@@ -17,7 +17,7 @@ import { campaignFactoryAbi } from '@/lib/abi';
 import { CREATE_STEPS, PROJECT_CATEGORIES } from '@/lib/constants';
 
 const controlClass =
-  'w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 placeholder:text-slate-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100';
+  'w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20';
 
 function resolveFactory(): Address {
   const envAddress = process.env.NEXT_PUBLIC_FACTORY;
@@ -247,13 +247,13 @@ export default function CreatePage() {
           title="Campaign Created!"
           description="Your crowdfunding campaign is now live on the blockchain"
         >
-          <div className="rounded-[28px] border-2 border-emerald-500 bg-emerald-50 p-6 sm:p-8">
+          <div className="rounded-[28px] border-2 border-success bg-success/10 p-6 sm:p-8">
             <div className="space-y-4 sm:space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-emerald-900 sm:text-xl">
+                <h3 className="text-lg font-semibold text-foreground sm:text-xl">
                   {createdCampaignAddress ? 'Project Created Successfully!' : 'Transaction Confirmed!'}
                 </h3>
-                <p className="mt-2 text-sm text-emerald-700">
+                <p className="mt-2 text-sm text-muted-foreground">
                   {createdCampaignAddress
                     ? 'Your campaign has been created and is now live on-chain.'
                     : 'Your transaction has been confirmed. The campaign should appear shortly.'}
@@ -261,11 +261,11 @@ export default function CreatePage() {
               </div>
 
               {txHash && (
-                <div className="rounded-xl bg-white p-4 text-sm">
-                  <p className="font-medium text-slate-700">Transaction Details</p>
-                  <p className="mt-1 break-all text-xs text-slate-600">{txHash}</p>
+                <div className="rounded-xl bg-card p-4 text-sm ring-1 ring-border">
+                  <p className="font-medium text-foreground">Transaction Details</p>
+                  <p className="mt-1 break-all text-xs text-muted-foreground">{txHash}</p>
                   {receipt && (
-                    <p className="mt-2 text-xs text-slate-500">
+                    <p className="mt-2 text-xs text-muted-foreground">
                       Block: {Number(receipt.blockNumber)} | Gas: {receipt.gasUsed?.toString()}
                     </p>
                   )}
@@ -276,7 +276,7 @@ export default function CreatePage() {
                 {createdCampaignAddress && (
                   <AppButton
                     asChild
-                    className="rounded-full bg-emerald-600 px-8 hover:bg-emerald-700"
+                    className="rounded-full bg-success px-8 text-success-foreground hover:bg-success/90"
                   >
                     <Link href={`/projects/${createdCampaignAddress}`}>View Campaign</Link>
                   </AppButton>
@@ -315,8 +315,8 @@ export default function CreatePage() {
             >
               <div className="grid gap-4">
                 <div className="grid gap-2">
-                  <label className="text-sm font-medium text-slate-700" htmlFor="title">
-                    Project Title <span className="text-rose-500">*</span>
+                  <label className="text-sm font-medium text-foreground" htmlFor="title">
+                    Project Title <span className="text-destructive">*</span>
                   </label>
                   <AppInput
                     id="title"
@@ -327,8 +327,8 @@ export default function CreatePage() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <label className="text-sm font-medium text-slate-700" htmlFor="tagline">
-                    Tagline <span className="text-rose-500">*</span>
+                  <label className="text-sm font-medium text-foreground" htmlFor="tagline">
+                    Tagline <span className="text-destructive">*</span>
                   </label>
                   <AppInput
                     id="tagline"
@@ -339,8 +339,8 @@ export default function CreatePage() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <label className="text-sm font-medium text-slate-700" htmlFor="description">
-                    Description <span className="text-rose-500">*</span>
+                  <label className="text-sm font-medium text-foreground" htmlFor="description">
+                    Description <span className="text-destructive">*</span>
                   </label>
                   <textarea
                     id="description"
@@ -353,7 +353,7 @@ export default function CreatePage() {
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-700" htmlFor="category">
+                    <label className="text-sm font-medium text-foreground" htmlFor="category">
                       Category
                     </label>
                     <select
@@ -370,7 +370,7 @@ export default function CreatePage() {
                     </select>
                   </div>
                   <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-700" htmlFor="cover">
+                    <label className="text-sm font-medium text-foreground" htmlFor="cover">
                       Cover Image URL
                     </label>
                     <AppInput
@@ -396,8 +396,8 @@ export default function CreatePage() {
               <div className="grid gap-4">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-700" htmlFor="goal">
-                      Goal Amount (ETH) <span className="text-rose-500">*</span>
+                    <label className="text-sm font-medium text-foreground" htmlFor="goal">
+                      Goal Amount (ETH) <span className="text-destructive">*</span>
                     </label>
                     <AppInput
                       id="goal"
@@ -410,8 +410,8 @@ export default function CreatePage() {
                     />
                   </div>
                   <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-700" htmlFor="deadline">
-                      Deadline <span className="text-rose-500">*</span>
+                    <label className="text-sm font-medium text-foreground" htmlFor="deadline">
+                      Deadline <span className="text-destructive">*</span>
                     </label>
                     <AppInput
                       id="deadline"
@@ -423,7 +423,7 @@ export default function CreatePage() {
                   </div>
                 </div>
                 <div className="grid gap-2">
-                  <label className="text-sm font-medium text-slate-700" htmlFor="milestone">
+                  <label className="text-sm font-medium text-foreground" htmlFor="milestone">
                     Key Milestones (optional)
                   </label>
                   <textarea
@@ -456,12 +456,12 @@ export default function CreatePage() {
 
           {/* Error Messages */}
           {formError && (
-            <div className="rounded-xl bg-rose-50 p-4 text-sm text-rose-600">
+            <div className="rounded-xl bg-destructive/10 p-4 text-sm text-destructive">
               {formError}
             </div>
           )}
           {writeError && !formError && (
-            <div className="rounded-xl bg-rose-50 p-4 text-sm text-rose-600">
+            <div className="rounded-xl bg-destructive/10 p-4 text-sm text-destructive">
               {writeError.message}
             </div>
           )}
@@ -499,14 +499,14 @@ export default function CreatePage() {
 
           {/* Connection hint */}
           {!isConnected && currentStep === CREATE_STEPS.length - 1 && (
-            <p className="text-center text-xs text-slate-400">
+            <p className="text-center text-xs text-muted-foreground">
               Please connect your wallet to create a campaign
             </p>
           )}
 
           {/* Uploading indicator */}
           {isUploadingMetadata && (
-            <p className="text-center text-xs text-slate-400">
+            <p className="text-center text-xs text-muted-foreground">
               Uploading metadata to IPFS...
             </p>
           )}

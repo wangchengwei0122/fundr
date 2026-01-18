@@ -30,7 +30,7 @@ export function StatBlock({
   return (
     <div
       className={cn(
-        'rounded-[24px] bg-slate-50 p-4 sm:p-6',
+        'rounded-xl bg-muted/50 p-4 sm:p-6',
         layoutClass[layout],
         className
       )}
@@ -42,17 +42,17 @@ export function StatBlock({
             layout === 'horizontal' &&
               divided &&
               index > 0 &&
-              'border-l border-slate-200 pl-6 sm:pl-8'
+              'border-l border-border pl-6 sm:pl-8'
           )}
         >
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground/70">
             {stat.label}
           </p>
-          <p className="mt-1 text-xl font-semibold text-slate-900 sm:text-2xl">
+          <p className="mt-1 text-xl font-semibold text-foreground sm:text-2xl">
             {stat.value}
           </p>
           {stat.subtext && (
-            <p className="mt-0.5 text-xs text-slate-500">{stat.subtext}</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">{stat.subtext}</p>
           )}
         </div>
       ))}

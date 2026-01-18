@@ -15,9 +15,9 @@ export type HeroBlockProps = {
 };
 
 const variantStyles = {
-  default: 'bg-white',
-  gradient: 'bg-gradient-to-br from-slate-50 to-slate-100',
-  subtle: 'bg-slate-50/50',
+  default: 'bg-card',
+  gradient: 'bg-gradient-to-br from-background to-muted',
+  subtle: 'bg-muted/50',
 };
 
 export function HeroBlock({
@@ -31,8 +31,8 @@ export function HeroBlock({
   return (
     <div
       className={cn(
-        'rounded-[32px] p-8 sm:p-12 lg:p-16',
-        'shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5',
+        'rounded-2xl p-8 sm:p-12 lg:p-16',
+        'shadow-card ring-1 ring-border',
         variantStyles[variant],
         className
       )}
@@ -43,11 +43,11 @@ export function HeroBlock({
             {badge}
           </span>
         )}
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
           {title}
         </h1>
         {subtitle && (
-          <p className="mt-4 text-lg text-slate-600 sm:text-xl">{subtitle}</p>
+          <p className="mt-4 text-lg text-muted-foreground sm:text-xl">{subtitle}</p>
         )}
         {actions && (
           <div className="mt-8 flex flex-wrap justify-center gap-4">{actions}</div>

@@ -23,11 +23,11 @@ export function SummaryReview({
   return (
     <div
       className={cn(
-        'rounded-[28px] border-2 border-dashed border-slate-300 bg-white p-6 sm:p-8',
+        'rounded-xl border-2 border-dashed border-border bg-card p-6 sm:p-8',
         className
       )}
     >
-      <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
+      <h3 className="text-lg font-semibold text-foreground">{title}</h3>
 
       <dl className="mt-6 space-y-4">
         {items.map((item) => (
@@ -38,11 +38,11 @@ export function SummaryReview({
               item.highlight && 'rounded-xl bg-primary/5 p-3'
             )}
           >
-            <dt className="text-sm text-slate-500">{item.label}</dt>
+            <dt className="text-sm text-muted-foreground">{item.label}</dt>
             <dd
               className={cn(
                 'text-sm font-medium',
-                item.highlight ? 'text-primary' : 'text-slate-900'
+                item.highlight ? 'text-primary' : 'text-foreground'
               )}
             >
               {item.value}
@@ -52,8 +52,8 @@ export function SummaryReview({
       </dl>
 
       {transactionNote && (
-        <div className="mt-6 rounded-xl bg-amber-50 p-4">
-          <p className="text-sm text-amber-800">
+        <div className="mt-6 rounded-xl bg-warning/10 p-4">
+          <p className="text-sm text-warning-foreground">
             <span className="font-medium">On-chain action: </span>
             {transactionNote}
           </p>

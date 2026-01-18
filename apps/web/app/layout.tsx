@@ -27,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} bg-slate-50 antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} dark bg-background antialiased`}>
         <Web3Provider>
           <div className="min-h-screen w-full max-w-full overflow-x-hidden">
             <SiteNavbar />

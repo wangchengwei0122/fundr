@@ -116,7 +116,7 @@ export default function AccountPage() {
         description="Campaigns you have created"
         action={
           userCampaigns.length > 4 && (
-            <AppButton variant="ghost" size="sm" className="text-slate-500">
+            <AppButton variant="ghost" size="sm" className="text-muted-foreground">
               View All
             </AppButton>
           )
@@ -148,7 +148,7 @@ export default function AccountPage() {
         description="Projects you have supported"
         action={
           supportedCampaigns.length > 4 && (
-            <AppButton variant="ghost" size="sm" className="text-slate-500">
+            <AppButton variant="ghost" size="sm" className="text-muted-foreground">
               View All
             </AppButton>
           )

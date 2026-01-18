@@ -37,7 +37,7 @@ export function IdentityHeader({
   return (
     <section
       className={cn(
-        'rounded-[32px] bg-white p-6 shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5 sm:p-8',
+        'rounded-2xl bg-card p-6 shadow-card ring-1 ring-border sm:p-8',
         className
       )}
     >
@@ -69,15 +69,15 @@ export function IdentityHeader({
 
           {/* Address & Balance */}
           <div className="min-w-0 flex-1 space-y-1 sm:space-y-2">
-            <h1 className="truncate text-xl font-semibold text-slate-900 sm:text-2xl">
+            <h1 className="truncate text-xl font-semibold text-foreground sm:text-2xl">
               {displayName}
             </h1>
             {balance && (
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted-foreground">
                 Balance: {balance.value} {balance.symbol}
               </p>
             )}
-            <p className="truncate font-mono text-xs text-slate-400">{address}</p>
+            <p className="truncate font-mono text-xs text-muted-foreground">{address}</p>
           </div>
         </div>
 
